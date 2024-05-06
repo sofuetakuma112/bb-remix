@@ -1,7 +1,7 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/cloudflare";
 import { and, eq } from "drizzle-orm";
 import { getDBClient } from "@/lib/client.server";
-import { posts } from "@/lib/schema";
+import { posts } from "@/db/schema";
 import { getAuthenticator } from "@/services/auth.server";
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {

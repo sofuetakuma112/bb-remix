@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { follow, unFollow } from '@/features/actions/follow';
+import { useState } from "react";
+
+const follow = (userId: string) => console.log("follow!");
+const unFollow = (userId: string) => console.log("unFollow!");
 
 const useFollow = (initialIsFollowing: boolean) => {
   const [isFollowee, setIsFollowing] = useState(initialIsFollowing);

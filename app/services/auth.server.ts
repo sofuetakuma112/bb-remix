@@ -5,12 +5,13 @@ import {
 } from "@remix-run/cloudflare";
 import { GoogleStrategy } from "remix-auth-google";
 import { eq } from "drizzle-orm";
-import { users } from "@/lib/schema";
+import { usersTable } from "@/db/schema";
 import { getDBClient } from "@/lib/client.server";
 
 export type User = {
+  id: string;
   name: string;
-  id: number;
+  image?: string;
 };
 
 let _authenticatedUser: Authenticator<User> | null = null;
@@ -38,12 +39,12 @@ export function getAuthenticator(context: AppLoadContext) {
         const db = getDBClient(context.cloudflare.env.DB);
         const exitsUser = await db
           .select()
-          .from(users)
-          .where(eq(users.providerId, profile.id))
+          .from(usersTable)
+          .where(eq(usersTable.providerId, profile.id))
           .limit(1);
         if (exitsUser.length === 0) {
           const createUser = await db
-            .insert(users)
+            .insert(usersTable)
             .values({
               provider: profile.provider,
               providerId: profile.id,
@@ -52,7 +53,11 @@ export function getAuthenticator(context: AppLoadContext) {
             })
             .returning()
             .get();
-          return { id: createUser.id, name: createUser.name };
+          return {
+            id: createUser.id,
+            name: createUser.name,
+            image: createUser.icon ?? undefined,
+          };
         }
         return { id: exitsUser[0].id, name: exitsUser[0].name };
       }
