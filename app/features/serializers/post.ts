@@ -1,16 +1,16 @@
 import { postsTable, usersTable, likesTable } from "@/db/schema";
 import { InferSelectModel } from "drizzle-orm";
-import { SerializedUser } from "@/features/types/serializer/like";
-import { SerializedPost } from "@/features/types/serializer/post";
 import { getImageUrlFromS3 } from "@/features/r2";
+import { AppLoadContext } from "@remix-run/cloudflare";
 
 export async function serializePost(
+  context: AppLoadContext,
   post: InferSelectModel<typeof postsTable> & {
     user: InferSelectModel<typeof usersTable>;
     likes: InferSelectModel<typeof likesTable>[];
   }
-): Promise<SerializedPost> {
-  const imageUrl = await getImageUrlFromS3(post.imageS3Key);
+) {
+  const imageUrl = await getImageUrlFromS3(context, post.imageS3Key);
 
   return {
     id: post.id,
@@ -25,14 +25,15 @@ export async function serializePost(
     imageName: post.imageName,
     imageAge: post.imageAge,
     imageBirthplace: post.imageBirthplace,
-    user: await serializeUser(post.user),
+    user: await serializeUser(context, post.user),
   };
 }
 
 export async function serializeUser(
+  context: AppLoadContext,
   user: InferSelectModel<typeof usersTable>
-): Promise<SerializedUser> {
-  const imageUrl = await getImageUrlFromS3(user.imageS3Key);
+) {
+  const imageUrl = await getImageUrlFromS3(context, user.imageS3Key);
 
   return {
     id: user.id,
@@ -40,3 +41,6 @@ export async function serializeUser(
     imageUrl: imageUrl || user.icon,
   };
 }
+
+export type SerializedPost = Awaited<ReturnType<typeof serializePost>>;
+export type SerializedUser = Awaited<ReturnType<typeof serializeUser>>;

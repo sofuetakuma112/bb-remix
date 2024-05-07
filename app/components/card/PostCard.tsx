@@ -169,7 +169,7 @@ function PostCard({
           <DeletePostDialog postId={postId} />
         )}
         {pageType === "likes" && postId && (
-          <RemoveLikeButton userId={userId} postId={postId} />
+          <RemoveLikeButton postId={postId} />
         )}
       </div>
       <p className={clsx("pb-1 text-lg font-semibold")}>{imageName}</p>

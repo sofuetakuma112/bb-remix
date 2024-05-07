@@ -1,9 +1,8 @@
-import { Link } from "@remix-run/react";
-import { useLocation } from "@remix-run/react";
+import { Link, useLocation } from "@remix-run/react";
 import { Tabs, TabsList, TabsTrigger } from "@/features/ui/tabs";
-import type { SerializedPost } from "@/features/types/serializer/post";
-import type { SerializedLikedPost } from "@/features/types/serializer/like";
 import { SerializeFrom } from "@remix-run/cloudflare";
+import { SerializedLikedPost } from "@/features/serializers/like";
+import { SerializedPost } from "@/features/serializers/post";
 
 type TabProps = {
   userId: string;

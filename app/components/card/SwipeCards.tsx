@@ -1,5 +1,3 @@
-"use client";
-
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { Link, useFetcher } from "@remix-run/react";
@@ -12,8 +10,8 @@ import { Badge } from "@/features/ui/badge";
 import { Button } from "@/features/ui/button";
 import { Card } from "@/features/ui/card";
 import { Icon } from "@/features/ui/icon";
-import { SerializedPost } from "@/features/types/serializer/post";
 import { SerializeFrom } from "@remix-run/cloudflare";
+import { SerializedPost } from "@/features/serializers/post";
 
 const commonClasses = {
   profileImage: "size-9 overflow-hidden rounded-lg",

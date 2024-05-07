@@ -177,7 +177,7 @@ export function Header({ user }: HeaderProps) {
       ),
     },
     {
-      href: `/${userId}/following`,
+      href: `/${userId}/followees`,
       text: "フォロー一覧",
       icon: (
         <Button variant="smOutline" sp="menubar" className="bg-white-white">

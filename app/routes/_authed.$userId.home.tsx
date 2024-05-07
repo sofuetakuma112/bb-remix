@@ -2,10 +2,10 @@ import { PostCard } from "@/components/card";
 import Profile from "@/components/profile/profile";
 import Tab from "@/components/tabs";
 import { getServerAuthSession } from "@/features/auth";
-import { getSuperLikePosts } from "@/features/drizzle/get/like";
+import { getLikePosts } from "@/features/drizzle/get/like";
 import { getUserPosts } from "@/features/drizzle/get/post";
 import { getUser } from "@/features/drizzle/get/user";
-import type { SerializedPost } from "@/features/types/serializer/post";
+import { SerializedPost } from "@/features/serializers/post";
 import { getDBClient } from "@/lib/client.server";
 import { User } from "@/services/auth.server";
 import { LoaderFunctionArgs, SerializeFrom, json } from "@remix-run/cloudflare";
@@ -26,7 +26,7 @@ export const loader = async ({
     await Promise.all([
       getUserPosts(db, context, params.userId),
       getUser(db, context, params.userId, currentUser.id),
-      getSuperLikePosts(db, context, params.userId, currentUser.id),
+      getLikePosts(db, context, params.userId, currentUser.id, "super_like"),
     ]);
 
   const { posts } = userPostsResponse;

@@ -1,10 +1,6 @@
 import { likesTable, postsTable, usersTable } from "@/db/schema";
-import { getImageUrlFromS3 } from "@/features/r2";
+import { serializePost } from "@/features/serializers/post";
 import { DrizzleClient } from "@/features/types/drizzle";
-import {
-  SerializedPost,
-  SerializedUser,
-} from "@/features/types/serializer/post";
 import { AppLoadContext } from "@remix-run/cloudflare";
 import {
   eq,
@@ -12,7 +8,6 @@ import {
   and,
   not,
   notInArray,
-  InferSelectModel,
   isNull,
 } from "drizzle-orm";
 
@@ -95,43 +90,4 @@ export async function getRecommendedPosts(
   }
 
   return { post: await serializePost(context, recommendedPost) };
-}
-
-async function serializePost(
-  context: AppLoadContext,
-  post: InferSelectModel<typeof postsTable> & {
-    user: InferSelectModel<typeof usersTable>;
-    likes: InferSelectModel<typeof likesTable>[];
-  }
-): Promise<SerializedPost> {
-  const imageUrl = await getImageUrlFromS3(context, post.imageS3Key);
-
-  return {
-    id: post.id,
-    prompt: post.prompt,
-    imageUrl,
-    analysisResult: post.analysisResult,
-    likeCount: post.likes.filter((l) => l.likeType === "like").length,
-    superLikeCount: post.likes.filter((l) => l.likeType === "super_like")
-      .length,
-    userId: post.userId,
-    hashTags: post.hashTags,
-    imageName: post.imageName,
-    imageAge: post.imageAge,
-    imageBirthplace: post.imageBirthplace,
-    user: await serializeUser(context, post.user),
-  };
-}
-
-async function serializeUser(
-  context: AppLoadContext,
-  user: InferSelectModel<typeof usersTable>
-): Promise<SerializedUser> {
-  const imageUrl = await getImageUrlFromS3(context, user.imageS3Key);
-
-  return {
-    id: user.id,
-    name: user.name,
-    imageUrl: imageUrl || user.icon,
-  };
 }
