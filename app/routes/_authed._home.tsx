@@ -1,15 +1,13 @@
-import { PostCard } from "@/components/card";
 import Profile from "@/components/profile/profile";
 import Tab from "@/components/tabs";
 import { getServerAuthSession } from "@/features/auth";
 import { getLikePosts } from "@/features/drizzle/get/like";
 import { getUserPosts } from "@/features/drizzle/get/post";
 import { getUser } from "@/features/drizzle/get/user";
-import { SerializedPost } from "@/features/serializers/post";
 import { getDBClient } from "@/lib/client.server";
 import { User } from "@/services/auth.server";
-import { LoaderFunctionArgs, SerializeFrom, json } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
+import { LoaderFunctionArgs, json } from "@remix-run/cloudflare";
+import { Outlet, useLoaderData } from "@remix-run/react";
 
 export const loader = async ({
   context,
@@ -55,35 +53,8 @@ export default function HomePage() {
       </div>
       <Tab userId={user.id} posts={posts} superLikePosts={superLikePosts} />
       <div className="flex flex-col pt-4 sm:pb-[100px] sm:pt-9">
-        <Cards currentUserId={currentUser.id} posts={posts} />
+        <Outlet />
       </div>
-    </div>
-  );
-}
-
-type CardsProps = {
-  currentUserId: string;
-  posts: SerializeFrom<SerializedPost[]>;
-};
-
-function Cards({ currentUserId, posts }: CardsProps) {
-  return (
-    <div className="mt-4 grid w-full gap-x-16 gap-y-9 pb-16 sm:mt-7 sm:w-auto sm:pb-0 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-      {posts.map((post) => (
-        <PostCard
-          postId={post.id}
-          imageUrl={post.imageUrl ?? ""}
-          imageName={post.imageName}
-          analysisResult={post.analysisResult}
-          profileUrl={post.user.imageUrl ?? ""}
-          currentUserId={currentUserId}
-          userId={post.user.id}
-          userName={post.user.name ?? ""}
-          key={post.id}
-          hashTags={post.hashTags as string[]}
-          prompt={post.prompt}
-        />
-      ))}
     </div>
   );
 }
