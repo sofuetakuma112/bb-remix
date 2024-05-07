@@ -25,7 +25,7 @@ export const loader = async ({
   const [userPostsResponse, userResponse, superLikePostsResponse] =
     await Promise.all([
       getUserPosts(db, context, params.userId),
-      getUser(db, params.userId),
+      getUser(db, context, params.userId, currentUser.id),
       getSuperLikePosts(db, context, params.userId, currentUser.id),
     ]);
 

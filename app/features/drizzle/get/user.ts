@@ -7,9 +7,15 @@ import {
 } from "@/db/schema";
 import { getImageUrlFromS3 } from "@/features/r2";
 import { DrizzleClient } from "@/features/types/drizzle";
+import { AppLoadContext } from "@remix-run/cloudflare";
 import { InferSelectModel, eq } from "drizzle-orm";
 
-export async function getUser(db: DrizzleClient, userId: string) {
+export async function getUser(
+  db: DrizzleClient,
+  context: AppLoadContext,
+  userId: string,
+  currentUserId: string
+) {
   const [user, currentUser] = await Promise.all([
     db.query.usersTable.findFirst({
       where: eq(usersTable.id, userId),
@@ -21,7 +27,7 @@ export async function getUser(db: DrizzleClient, userId: string) {
       },
     }),
     db.query.usersTable.findFirst({
-      where: eq(usersTable.id, userId),
+      where: eq(usersTable.id, currentUserId),
       with: {
         notifications: true,
         followers: true,
@@ -38,11 +44,12 @@ export async function getUser(db: DrizzleClient, userId: string) {
   }
 
   return {
-    user: await serializeUser(user, currentUser),
+    user: await serializeUser(context, user, currentUser),
   };
 }
 
 async function serializeUser(
+  context: AppLoadContext,
   user: InferSelectModel<typeof usersTable> & {
     posts: InferSelectModel<typeof postsTable>[];
     likes: InferSelectModel<typeof likesTable>[];
@@ -55,7 +62,8 @@ async function serializeUser(
     notifications: InferSelectModel<typeof notificationsTable>[];
   }
 ) {
-  const imageUrl = await getImageUrlFromS3(user.imageS3Key);
+  const imageUrl = await getImageUrlFromS3(context, user.imageS3Key);
+
   return {
     id: user.id,
     name: user.name,

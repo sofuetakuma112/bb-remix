@@ -34,7 +34,7 @@ export const loader = async ({ context, request }: LoaderFunctionArgs) => {
     //   .where(eq(posts.userId, user.id))
     //   .orderBy(desc(posts.id));
     // return json({ user, posts: userPosts })
-    return redirect("/home/recommended");
+    return redirect("/home");
   }
 };
 

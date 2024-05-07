@@ -22,8 +22,8 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
     relationName: "userNotificationsToUsers",
   }),
   likes: many(likesTable),
-  followers: many(followsTable, { relationName: "followers" }),
-  followees: many(followsTable, { relationName: "followees" }),
+  followers: many(followsTable, { relationName: "asFollower" }),
+  followees: many(followsTable, { relationName: "asFollowee" }),
 }));
 
 // Posts
@@ -121,12 +121,12 @@ export const followsRelations = relations(followsTable, ({ one }) => ({
   follower: one(usersTable, {
     fields: [followsTable.followerId],
     references: [usersTable.id],
-    relationName: "followers",
+    relationName: "asFollowee",
   }),
   followee: one(usersTable, {
     fields: [followsTable.followeeId],
     references: [usersTable.id],
-    relationName: "followees",
+    relationName: "asFollower",
   }),
 }));
 

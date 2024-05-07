@@ -149,7 +149,7 @@ export function Header({ user }: HeaderProps) {
 
   const links = [
     {
-      href: "/home/recommended",
+      href: "/home",
       text: "Home",
       icon: (
         <Button variant="smOutline" sp="menubar" className="bg-white-white">
