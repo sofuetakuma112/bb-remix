@@ -1,4 +1,4 @@
-import { Link, useLocation } from "@remix-run/react";
+import { useLocation, useNavigate } from "@remix-run/react";
 import { Tabs, TabsList, TabsTrigger } from "@/features/ui/tabs";
 import { SerializeFrom } from "@remix-run/cloudflare";
 import { SerializedLikedPost } from "@/features/serializers/like";
@@ -18,6 +18,8 @@ export default function Tab({
   const location = useLocation();
   const pathname = location.pathname;
   const selectedTab = pathname.split("/")[2];
+
+  const navigate = useNavigate();
   return (
     <Tabs
       defaultValue={selectedTab}
@@ -26,17 +28,17 @@ export default function Tab({
     >
       <div className="flex h-10">
         <TabsList className="flex gap-[48px]" variant="text">
-          <TabsTrigger value="home" variant="profileText">
-            <Link to={`/${userId}/home`} className="flex gap-8">
+          <TabsTrigger value="home" variant="profileText" onClick={() => navigate(`/${userId}/home`)}>
+            <p className="flex gap-8">
               <p>投稿</p>
               <p>{posts.length}</p>
-            </Link>
+            </p>
           </TabsTrigger>
-          <TabsTrigger value="super-likes" variant="profileText">
-            <Link to={`/${userId}/super-likes`} className="flex gap-8">
+          <TabsTrigger value="super-likes" variant="profileText" onClick={() => navigate(`/${userId}/super-likes`)}>
+            <p className="flex gap-8">
               <p>スーパーライク</p>
               <p>{superLikePosts.length}</p>
-            </Link>
+            </p>
           </TabsTrigger>
         </TabsList>
       </div>

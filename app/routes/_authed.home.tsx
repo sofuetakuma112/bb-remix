@@ -7,17 +7,27 @@ import {
   json,
 } from "@remix-run/cloudflare";
 import { getDBClient } from "@/lib/client.server";
-import { useLoaderData } from "@remix-run/react";
-import { getRecommendedPosts } from "@/features/drizzle/get/post";
+import { useFetcher, useLoaderData } from "@remix-run/react";
+import {
+  getFollowingPosts,
+  getRecommendedPosts,
+} from "@/features/drizzle/get/post";
 import { like } from "@/features/drizzle/mutation/like";
 import { getServerAuthSession } from "@/features/auth";
+import { useState } from "react";
 
 export const loader = async ({ context, request }: LoaderFunctionArgs) => {
   const currentUser = (await getServerAuthSession(context, request)) as User;
   const userId = currentUser.id;
 
+  const url = new URL(request.url);
+  const type = url.searchParams.get("type") ?? "recommend";
+
   const db = getDBClient(context.cloudflare.env.DB);
-  const { post } = await getRecommendedPosts(db, context, userId);
+  const { post } =
+    type === "recommend"
+      ? await getRecommendedPosts(db, context, userId)
+      : await getFollowingPosts(db, context, userId);
 
   return json(post);
 };
@@ -38,6 +48,8 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
 
 export default function HomePage() {
   const post = useLoaderData<typeof loader>();
+  const fetcher = useFetcher();
+  const [tabValue, setTabValue] = useState("recommend");
 
   return (
     <div className="h-full px-2 sm:px-8">
@@ -49,30 +61,37 @@ export default function HomePage() {
       >
         <div className="flex h-16 sm:flex-1 items-center sm:max-h-[calc(100%-48px-785px-20px)] sm:min-h-[calc(48px+16px_*_2)] sm:py-4">
           <TabsList className="mx-auto flex justify-center" variant="text">
-            <TabsTrigger value="recommend" variant="text">
+            <TabsTrigger
+              value="recommend"
+              variant="text"
+              onClick={() => {
+                fetcher.load("/home?type=recommend");
+                setTabValue("recommend");
+              }}
+            >
               おすすめ
             </TabsTrigger>
             <div className="mx-4 min-h-full w-0.5 bg-gray-300"></div>
-            <TabsTrigger value="following" variant="text">
+            <TabsTrigger
+              value="following"
+              variant="text"
+              onClick={() => {
+                fetcher.load("/home?type=following");
+                setTabValue("following");
+              }}
+            >
               フォロー中
             </TabsTrigger>
           </TabsList>
         </div>
         <div className="h-full max-h-[calc(100%-64px-64px)] flex-1 sm:max-h-full mx-auto">
           <TabsContent
-            value="recommend"
+            value={tabValue}
             variant="text"
             className="h-full flex-col items-center"
           >
-            <SwipeCards tabValue="recommend" post={post} />
+            <SwipeCards tabValue={tabValue} post={post} />
           </TabsContent>
-          {/* <TabsContent
-            value="following"
-            variant="text"
-            className="hidden h-full flex-col items-center data-[state=active]:flex"
-          >
-            <SwipeCards tabValue="following" type="followings" />
-          </TabsContent> */}
         </div>
       </Tabs>
     </div>

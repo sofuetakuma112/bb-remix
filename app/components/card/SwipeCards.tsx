@@ -486,11 +486,10 @@ function SwipeCards({ tabValue, post }: SwipeCardsProps) {
   };
 
   if (post == null) {
-    return <SkeletonCard />;
+    return <NoCard />;
   }
 
   const currentPost = post;
-  if (!currentPost) return <NoCard />;
 
   const handleReload = () => {
     // TODO: リロード処理を実装する
