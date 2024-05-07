@@ -61,7 +61,6 @@ async function getImageUrlFromS3(
   };
   const command = new GetObjectCommand(params);
   const url = await getSignedUrl(client, command, { expiresIn: 3600 });
-  console.log("url:", url);
   return url;
 }
 

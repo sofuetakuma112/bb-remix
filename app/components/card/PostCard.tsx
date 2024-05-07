@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { Link } from "@remix-run/react";
+import { Link, useFetcher } from "@remix-run/react";
 import { Badge } from "@/features/ui/badge";
 import { Button } from "@/features/ui/button";
 import { Card } from "@/features/ui/card";
@@ -57,7 +57,7 @@ function PromptDialog({
           </div>
         </button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-white">
         <DialogHeader>
           <DialogTitle>ハッシュタグ</DialogTitle>
         </DialogHeader>
@@ -82,31 +82,29 @@ function PromptDialog({
   );
 }
 
-type DeletePostDialogProps = { postId: string; userId: string };
+type DeletePostDialogProps = { postId: string };
 
-function DeletePostDialog({ postId, userId }: DeletePostDialogProps) {
-  // TODO: 編集フォームのUI実装する
+function DeletePostDialog({ postId }: DeletePostDialogProps) {
+  const fecher = useFetcher();
   return (
     <Dialog>
       <DialogTrigger className="absolute right-2 top-2">
         <Icon name="trash-can" width="23" height="26" />
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-white">
         <DialogHeader>
           <DialogTitle>投稿を削除しますか？</DialogTitle>
           <DialogDescription>この処理はもとに戻せません</DialogDescription>
         </DialogHeader>
         <div className="flex justify-center">
-          <DialogClose asChild>
-            <Button
-              variant="delete"
-              className="m-2"
-              // deletePost
-              onClick={() => console.log(postId, userId)}
-            >
-              削除する
-            </Button>
-          </DialogClose>
+          <fecher.Form action={`/posts/delete`} method="post">
+            <input type="hidden" value={postId} name="postId" />
+            <DialogClose asChild>
+              <Button type="submit" variant="delete" className="m-2">
+                削除する
+              </Button>
+            </DialogClose>
+          </fecher.Form>
           <DialogClose asChild>
             <Button variant="close" className="m-2">
               Close
@@ -168,15 +166,13 @@ function PostCard({
           isUnderReviewPost={isUnderReviewPost}
         />
         {currentUserId === userId && pageType === "posts" && postId && (
-          <DeletePostDialog postId={postId} userId={userId} />
+          <DeletePostDialog postId={postId} />
         )}
         {pageType === "likes" && postId && (
           <RemoveLikeButton userId={userId} postId={postId} />
         )}
       </div>
-      <p className={clsx("pb-1 text-lg font-semibold")}>
-        {imageName}
-      </p>
+      <p className={clsx("pb-1 text-lg font-semibold")}>{imageName}</p>
       <div className="flex">
         <Link to={`/${userId}/home`}>
           <div className="mr-1 size-9 overflow-hidden rounded-lg">

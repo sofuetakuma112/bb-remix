@@ -1,24 +1,32 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/cloudflare";
+import { ActionFunctionArgs } from "@remix-run/cloudflare";
 import { and, eq } from "drizzle-orm";
 import { getDBClient } from "@/lib/client.server";
-import { posts } from "@/db/schema";
+import { postsTable } from "@/db/schema";
 import { getAuthenticator } from "@/services/auth.server";
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {
   const authenticator = getAuthenticator(context);
   const user = await authenticator.isAuthenticated(request);
   if (user) {
-    const db = getDBClient(context.cloudflare.env.DB)
-    const formData = await request.formData()
-    const postId = (formData.get("post-id")?.toString())
+    const userId = user.id;
+    const db = getDBClient(context.cloudflare.env.DB);
+    const formData = await request.formData();
+    const postId = formData.get("postId")?.toString();
     // validation
-    if (postId === undefined || Number.isNaN(parseInt(postId))) {
-      return new Response("Post ID is invalid", { status: 500 })
+    if (postId == null) {
+      return new Response("Post ID is invalid", { status: 500 });
     }
-    await db.delete(posts).where(and(
-      eq(posts.id, parseInt(postId)),
-      eq(posts.userId, user.id),
-    ))
+
+    // ログインユーザーの投稿かチェック
+    const post = await db.query.postsTable.findFirst({
+      where: and(eq(postsTable.id, postId), eq(postsTable.userId, userId)),
+    });
+
+    if (!post) {
+      return new Response("Post not found", { status: 404 });
+    }
+
+    await db.delete(postsTable).where(eq(postsTable.id, post.id));
   }
-  return redirect("/")
+  return null;
 };
