@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/cloudflare";
 import { getDBClient } from "@/lib/client.server";
-import { posts } from "@/db/schema";
+import { postsTable } from "@/db/schema";
 import { getAuthenticator } from "@/services/auth.server";
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {
@@ -14,7 +14,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
     if (postBody === undefined || postBody.length === 0) {
       return new Response("Post body is empty", { status: 500 })
     }
-    await db.insert(posts).values({ body: postBody?.toString(), userId: user.id })
+    await db.insert(postsTable).values({ body: postBody?.toString(), userId: user.id })
   }
   return redirect("/")
 };

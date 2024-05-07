@@ -2,6 +2,7 @@ import { useState } from "react";
 import EditProfile from "@/components/profile/editProfile";
 import { Button } from "@/features/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/features/ui/dialog";
+import { useFetcher } from "@remix-run/react";
 
 type EditProfileDialogProps = {
   currentUserId?: string;
@@ -18,12 +19,10 @@ function EditProfileDialog({
 }: EditProfileDialogProps) {
   const [open, setOpen] = useState(false);
 
-  // TODO: 編集フォームのUI実装する
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {userId === currentUserId ? (
         <DialogTrigger asChild>
-          {/* TODO: Imageコンポーネントに置き換える */}
           <button onClick={() => setOpen(true)}>
             <img
               src={profileUrl}
@@ -33,7 +32,6 @@ function EditProfileDialog({
           </button>
         </DialogTrigger>
       ) : (
-        // TODO: Imageコンポーネントに置き換える
         <img src={profileUrl} alt="AI画像" className="size-full object-cover" />
       )}
 
@@ -67,6 +65,7 @@ export default function Profile({
   followingCount,
   isFollowee,
 }: UserProfileProps) {
+  const fetcher = useFetcher();
   return (
     <>
       <div className="size-16 overflow-hidden rounded-lg sm:size-20">
@@ -82,26 +81,28 @@ export default function Profile({
       </h1>
       {/*Todo: 認証が入ったら修正, フォロー、フォロー中も*/}
       {userId !== currentUserId && isFollowee && (
-        <Button
-          variant="following"
-          font="bold"
-          className="text-black-black mt-2"
-          // unFollow
-          onClick={() => console.log(userId)}
-        >
-          フォロー中
-        </Button>
+        <fetcher.Form action="/follows/delete" method="post">
+          <input type="hidden" name="userId" value={userId} />
+          <Button
+            variant="following"
+            font="bold"
+            className="text-black-black mt-2"
+          >
+            フォロー中
+          </Button>
+        </fetcher.Form>
       )}
       {userId !== currentUserId && !isFollowee && (
-        <Button
-          variant="follow"
-          font="bold"
-          className="text-white-white mt-2"
-          // follow
-          onClick={() => console.log(userId)}
-        >
-          フォロー
-        </Button>
+        <fetcher.Form action="/follows/create" method="post">
+          <input type="hidden" name="userId" value={userId} />
+          <Button
+            variant="follow"
+            font="bold"
+            className="text-white-white mt-2"
+          >
+            フォロー
+          </Button>
+        </fetcher.Form>
       )}
 
       <div className="sm:t-7 mt-4 flex gap-8">

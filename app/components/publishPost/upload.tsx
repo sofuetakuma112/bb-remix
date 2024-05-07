@@ -76,7 +76,7 @@ export default function Upload() {
           <label htmlFor="file-field">
             デスクトップから写真をドラッグできます。
           </label>
-          <FileUpload id="file-field" name="file" accept="image/*" />
+          <FileUpload id="file-field" name="file" />
         </div>
         <div className="mt-4 w-full sm:mt-7 flex items-center flex-col">
           <label className="text-xl font-semibold" htmlFor="imageName-field">

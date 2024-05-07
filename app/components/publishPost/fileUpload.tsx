@@ -10,12 +10,9 @@ import { Icon } from "@/features/ui/icon";
 interface FileUploadProps {
   id: string;
   name: string;
-  accept: string;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({
-  ...props
-}) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ ...props }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,7 +23,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       reader.onload = () => {
         const result = reader.result as string;
         setPreviewUrl(result);
-        onFileSelect(file, result);
+        // onFileSelect(file, result);
       };
       reader.readAsDataURL(file);
     }
@@ -49,7 +46,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         reader.onload = () => {
           const result = reader.result as string;
           setPreviewUrl(result);
-          onFileSelect(file, result);
+          // onFileSelect(file, result);
         };
         reader.readAsDataURL(file);
       }
@@ -71,6 +68,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         ref={fileInputRef}
         className="hidden"
         onChange={handleFileSelect}
+        accept="image/*"
         {...props}
       />
       {previewUrl && (

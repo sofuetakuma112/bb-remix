@@ -1,8 +1,7 @@
-import clsx from 'clsx';
-import { Link } from "@remix-run/react";
-import { useFollow } from '@/features/hooks/useFollow';
-import { Button } from '@/features/ui/button';
-import { Card } from '@/features/ui/card';
+import clsx from "clsx";
+import { Link, useFetcher } from "@remix-run/react";
+import { Button } from "@/features/ui/button";
+import { Card } from "@/features/ui/card";
 
 type Props = {
   profileUrl: string;
@@ -16,44 +15,58 @@ function UserCard({
   profileUrl,
   userId,
   userName,
-  isFollowee: initialIsFollowing,
+  isFollowee,
   className,
 }: Props) {
-  const { isFollowee, isLoading, handleFollow, handleUnfollow } = useFollow(initialIsFollowing);
+  const fetcher = useFetcher();
 
   return (
-    <Card variant="list" color="white" className={clsx('flex-col overflow-hidden', className)}>
+    <Card
+      variant="list"
+      color="white"
+      className={clsx("flex-col overflow-hidden", className)}
+    >
       <div className="h-[256px]">
         {/* TODO: Imageコンポーネントに置き換える */}
         <Link to={`/${userId}/home`}>
-          <img src={profileUrl} alt="ユーザープロフィール画像" className="size-full object-cover" />
+          <img
+            src={profileUrl}
+            alt="ユーザープロフィール画像"
+            className="size-full object-cover"
+          />
         </Link>
       </div>
       <div className="px-2 pb-4 pt-1">
         <Link to={`/${userId}/home`}>
-          <p className="text-black-black pb-3 text-2xl font-semibold">{userName}</p>
+          <p className="text-black-black pb-3 text-2xl font-semibold">
+            {userName}
+          </p>
         </Link>
         <div className="flex justify-center">
           {isFollowee ? (
-            <Button
-              variant="following"
-              font="bold"
-              className="text-black-black"
-              onClick={() => handleUnfollow(userId)}
-              disabled={isLoading}
-            >
-              フォロー中
-            </Button>
+            <fetcher.Form action="/follows/delete" method="post">
+              <input type="hidden" name="userId" value={userId} />
+              <Button
+                type="submit"
+                variant="following"
+                font="bold"
+                className="text-black-black"
+              >
+                フォロー中
+              </Button>
+            </fetcher.Form>
           ) : (
-            <Button
-              variant="follow"
-              font="bold"
-              className="text-white-white"
-              onClick={() => handleFollow(userId)}
-              disabled={isLoading}
-            >
-              フォロー
-            </Button>
+            <fetcher.Form action="/follows/create" method="post">
+              <input type="hidden" name="userId" value={userId} />
+              <Button
+                type="submit"
+                variant="follow"
+                font="bold"
+                className="text-white-white"
+              >
+                フォロー
+              </Button>
+            </fetcher.Form>
           )}
         </div>
       </div>
