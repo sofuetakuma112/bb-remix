@@ -14,7 +14,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
     const postId = formData.get("postId")?.toString();
     // validation
     if (postId == null) {
-      return new Response("Post ID is invalid", { status: 500 });
+      return new Response("postId is required", { status: 400 });
     }
 
     // ログインユーザーの投稿かチェック

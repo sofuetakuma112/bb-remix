@@ -89,7 +89,7 @@ function UserIconMenu({ profileUrl, userId, className }: UserIconMenuProps) {
   return (
     <Menubar className={clsx("h-full", className)} asChild>
       <MenubarMenu>
-        <MenubarTrigger className="block h-full sm:hidden">
+        <MenubarTrigger className="block h-full sm:hidden bg-white-white rounded-none">
           <div className="size-10 cursor-pointer overflow-hidden rounded-full sm:size-16">
             <img
               src={profileUrl}

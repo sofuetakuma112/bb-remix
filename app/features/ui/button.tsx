@@ -34,7 +34,7 @@ const buttonVariants = cva(
       sp: {
         none: "",
         menubar:
-          "border-input hover:bg-accent hover:text-accent-foreground flex flex-1 sm:flex-none items-center justify-center border-0 w-full rounded-none",
+          "border-input hover:text-accent-foreground flex flex-1 sm:flex-none items-center justify-center border-0 w-full rounded-none",
       },
     },
     defaultVariants: {
