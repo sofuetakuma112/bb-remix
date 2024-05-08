@@ -11,6 +11,7 @@ import { User } from "@/services/auth.server";
 import { postsTable } from "@/db/schema";
 import { getDBClient } from "@/lib/client.server";
 import { uploadImageToS3 } from "@/features/r2";
+import { useRouteError } from "@remix-run/react";
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {
   const currentUser = (await getServerAuthSession(context, request)) as User;
@@ -63,6 +64,16 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
 
   return redirect(`/${userId}/home`);
 };
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (error instanceof Error) {
+    return <div>{error.message}</div>;
+  }
+
+  return <div>{error?.toString()}</div>;
+}
 
 export default function FormPage() {
   return (
