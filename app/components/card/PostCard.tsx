@@ -29,7 +29,7 @@ type PromptDialogProps = {
 
 function PromptDialog({
   imageUrl,
-  analysisResult,
+  // analysisResult,
   hashTags,
   prompt,
   isUnderReviewPost,
@@ -45,7 +45,7 @@ function PromptDialog({
               className={clsx("size-full object-cover")}
             />
           </div>
-          <div
+          {/* <div
             className={clsx("h-full overflow-hidden rounded-2xl", {
               "absolute inset-0 flex items-center justify-center bg-gray-600":
                 isUnderReviewPost,
@@ -54,7 +54,7 @@ function PromptDialog({
             })}
           >
             <span className="text-xl text-white-white">審査中</span>
-          </div>
+          </div> */}
         </button>
       </DialogTrigger>
       <DialogContent className="bg-white">
