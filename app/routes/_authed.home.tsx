@@ -7,14 +7,13 @@ import {
   json,
 } from "@remix-run/cloudflare";
 import { getDBClient } from "@/lib/client.server";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import {
   getFollowingPosts,
   getRecommendedPosts,
 } from "@/features/drizzle/get/post";
 import { like } from "@/features/drizzle/mutation/like";
 import { getServerAuthSession } from "@/features/auth";
-import { useState } from "react";
 
 export const loader = async ({ context, request }: LoaderFunctionArgs) => {
   const currentUser = (await getServerAuthSession(context, request)) as User;
@@ -48,8 +47,12 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
 
 export default function HomePage() {
   const post = useLoaderData<typeof loader>();
-  const fetcher = useFetcher();
-  const [tabValue, setTabValue] = useState("recommend");
+  const navigate = useNavigate();
+
+  const location = useLocation();
+  const query = location.search;
+  const params = new URLSearchParams(query);
+  const tabValue = params.get("type") ?? "recommend";
 
   return (
     <div className="h-full px-2 sm:px-8">
@@ -64,10 +67,7 @@ export default function HomePage() {
             <TabsTrigger
               value="recommend"
               variant="text"
-              onClick={() => {
-                fetcher.load("/home?type=recommend");
-                setTabValue("recommend");
-              }}
+              onClick={() => navigate(`/home?type=recommend`)}
             >
               おすすめ
             </TabsTrigger>
@@ -75,10 +75,7 @@ export default function HomePage() {
             <TabsTrigger
               value="following"
               variant="text"
-              onClick={() => {
-                fetcher.load("/home?type=following");
-                setTabValue("following");
-              }}
+              onClick={() => navigate(`/home?type=following`)}
             >
               フォロー中
             </TabsTrigger>

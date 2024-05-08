@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { Link, useFetcher } from "@remix-run/react";
-import { SkeletonCard } from "@/components/card";
 import {
   followingCurrentScrollIndexAtom,
   recommendCurrentScrollIndexAtom,
@@ -484,6 +483,7 @@ function SwipeCards({ tabValue, post }: SwipeCardsProps) {
   const mutate = () => {
     console.log("mutate!");
   };
+
 
   if (post == null) {
     return <NoCard />;
