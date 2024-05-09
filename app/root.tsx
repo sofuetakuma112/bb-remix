@@ -1,11 +1,5 @@
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from "@remix-run/react";
+import { captureRemixErrorBoundaryError } from "@sentry/remix";
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from "@remix-run/react";
 import stylesheet from "@/tailwind.css?url";
 import { IconDefs } from "@/features/ui/icon/IconDefs";
 import { LinksFunction } from "@remix-run/cloudflare";
@@ -13,6 +7,12 @@ import { LinksFunction } from "@remix-run/cloudflare";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
+
+export const ErrorBoundary = () => {
+  const error = useRouteError();
+  captureRemixErrorBoundaryError(error);
+  return <div>Something went wrong</div>;
+};
 
 export default function App() {
   return (

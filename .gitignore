@@ -7,3 +7,9 @@ node_modules
 .wrangler
 wrangler.toml
 .dev.vars
+
+# Sentry Config File
+.sentryclirc
+
+# Sentry Config File
+.env.sentry-build-plugin
