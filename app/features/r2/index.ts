@@ -27,10 +27,13 @@ async function uploadImageToS3(
 ): Promise<string> {
   const key = `${type}/${uuidv4()}`;
 
+  const arrayBuffer = await file.arrayBuffer();
+  const body = new Uint8Array(arrayBuffer);
+
   const params = {
     Bucket: context.cloudflare.env.BUCKET_NAME,
     Key: key,
-    Body: Buffer.from(await file.arrayBuffer()),
+    Body: body,
   };
   const command = new PutObjectCommand(params);
 
