@@ -6,10 +6,6 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Buffer } from 'buffer'
-
-// TODO: 初期化を行うファイルが分かったらこの処理を移動する
-window.Buffer = window.Buffer || Buffer
 
 const createS3Client = (context: AppLoadContext) =>
   new S3Client({

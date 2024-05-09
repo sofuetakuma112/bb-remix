@@ -8,6 +8,9 @@
 import { RemixBrowser } from "@remix-run/react";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
+import { Buffer } from 'buffer'
+
+globalThis.Buffer = Buffer as unknown as BufferConstructor;
 
 // Sentry.init({
 //     dsn: "https://00acf855cec4422e8866e090a725df99@o4507221516484608.ingest.us.sentry.io/4507221518385152",
