@@ -8,6 +8,7 @@ import { Button } from "@/features/ui/button";
 import { Input } from "@/features/ui/input";
 import { FileUpload } from "@/components/publishPost/fileUpload";
 import { useFetcher } from "@remix-run/react";
+import { useEffect } from "react";
 
 // const isFileSupported = typeof File !== "undefined";
 
@@ -35,6 +36,13 @@ type EditProfileProps = {
 
 export default function EditProfile({ userName, close }: EditProfileProps) {
   const fetcher = useFetcher();
+
+  useEffect(() => {
+    if (fetcher.state === "loading") {
+      // ローダーが呼ばれた際のステート
+      close();
+    }
+  }, [close, fetcher.state]);
 
   return (
     <fetcher.Form
@@ -70,7 +78,6 @@ export default function EditProfile({ userName, close }: EditProfileProps) {
           type="submit"
           variant="upload"
           className="mt-9 font-semibold"
-          onClick={close}
         >
           投稿する
         </Button>

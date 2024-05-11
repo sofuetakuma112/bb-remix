@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import EditProfile from "@/components/profile/editProfile";
 import { Button } from "@/features/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/features/ui/dialog";
@@ -18,6 +18,9 @@ function EditProfileDialog({
   profileUrl,
 }: EditProfileDialogProps) {
   const [open, setOpen] = useState(false);
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -36,10 +39,7 @@ function EditProfileDialog({
       )}
 
       <DialogContent className="px-0 py-4">
-        <EditProfile
-          userName={userName}
-          close={() => setOpen(false)}
-        />
+        <EditProfile userName={userName} close={handleClose} />
       </DialogContent>
     </Dialog>
   );
