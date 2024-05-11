@@ -1,6 +1,5 @@
 import clsx from "clsx";
-import { Link } from "@remix-run/react";
-import { useFollow } from "@/features/hooks/useFollow";
+import { Link, useFetcher } from "@remix-run/react";
 import { Button } from "@/features/ui/button";
 
 type Props = {
@@ -15,11 +14,10 @@ function UserItem({
   profileUrl,
   userId,
   userName,
-  isFollowee: initialIsFollowing,
+  isFollowee,
   className,
 }: Props) {
-  const { isFollowee, isLoading, handleFollow, handleUnfollow } =
-    useFollow(initialIsFollowing);
+  const fetcher = useFetcher();
 
   return (
     <div
@@ -47,25 +45,27 @@ function UserItem({
       </div>
       <div className="flex justify-center">
         {isFollowee ? (
-          <Button
-            variant="following"
-            font="bold"
-            className="text-black-black"
-            onClick={() => handleUnfollow(userId)}
-            disabled={isLoading}
-          >
-            フォロー中
-          </Button>
+          <fetcher.Form action="/follows/delete" method="post">
+            <input type="hidden" name="userId" value={userId} />
+            <Button
+              variant="following"
+              font="bold"
+              className="text-black-black mt-2"
+            >
+              フォロー中
+            </Button>
+          </fetcher.Form>
         ) : (
-          <Button
-            variant="follow"
-            font="bold"
-            className="text-white-white"
-            onClick={() => handleFollow(userId)}
-            disabled={isLoading}
-          >
-            フォロー
-          </Button>
+          <fetcher.Form action="/follows/create" method="post">
+            <input type="hidden" name="userId" value={userId} />
+            <Button
+              variant="follow"
+              font="bold"
+              className="text-white-white mt-2"
+            >
+              フォロー
+            </Button>
+          </fetcher.Form>
         )}
       </div>
     </div>
