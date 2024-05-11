@@ -58,6 +58,7 @@ export async function getRecommendedPosts(
   context: AppLoadContext,
   userId: string
 ) {
+  console.log("getRecommendedPosts");
   const likePostIds = (
     await db.query.likesTable.findMany({
       where: eq(likesTable.userId, userId),

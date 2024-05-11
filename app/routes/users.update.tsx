@@ -1,22 +1,25 @@
 import {
   ActionFunctionArgs,
+  redirect,
   unstable_createMemoryUploadHandler,
   unstable_parseMultipartFormData,
 } from "@remix-run/cloudflare";
 import { getDBClient } from "@/lib/client.server";
 import { usersTable } from "@/db/schema";
-import { User } from "@/services/auth.server";
-import { getServerAuthSession } from "@/features/auth";
+import { getAuthenticator } from "@/services/auth.server";
 import { eq } from "drizzle-orm";
 import { uploadImageToS3 } from "@/features/r2";
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {
-  const user = (await getServerAuthSession(context, request)) as User;
-  if (user) {
+  const authenticator = getAuthenticator(context);
+  const currentUser = await authenticator.isAuthenticated(request);
+  if (!currentUser || !currentUser.id) return redirect("/login");
+
+  if (currentUser) {
     const db = getDBClient(context.cloudflare.env.DB);
 
     const foundUser = await db.query.usersTable.findFirst({
-      where: eq(usersTable.id, user.id),
+      where: eq(usersTable.id, currentUser.id),
     });
     if (!foundUser) {
       return new Response("User not found", { status: 404 });
@@ -32,11 +35,11 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
 
     const file = formData.get("file") as File;
 
-    let key
+    let key;
     if (file.size !== 0) {
       key = await uploadImageToS3(context, file, "posts");
     }
-    
+
     const userName = formData.get("userName")?.toString();
     if (!userName) {
       return new Response("userName is required", { status: 404 });
@@ -52,13 +55,11 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
         name: userName ?? foundUser.name,
         imageS3Key: key,
       })
-      .where(eq(usersTable.id, user.id));
+      .where(eq(usersTable.id, currentUser.id));
   }
   return null;
 };
 
-export function handleError(
-  error: unknown,
-) {
+export function handleError(error: unknown) {
   console.log(error);
 }

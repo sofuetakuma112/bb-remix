@@ -1,24 +1,25 @@
 import { Link, useLoaderData } from "@remix-run/react";
 import { Button } from "@/features/ui/button";
 import { Icon } from "@/features/ui/icon";
-import { LoaderFunctionArgs, SerializeFrom, json } from "@remix-run/cloudflare";
-import { getServerAuthSession } from "@/features/auth";
+import {
+  LoaderFunctionArgs,
+  SerializeFrom,
+  json,
+  redirect,
+} from "@remix-run/cloudflare";
 import { getDBClient } from "@/lib/client.server";
 import { convertToJST } from "@/lib/date";
-import { User } from "@/services/auth.server";
 import { getNotifications } from "@/features/drizzle/get/notification";
 import { SerializedNotifierUser } from "@/features/serializers/notification";
+import { getAuthenticator } from "@/services/auth.server";
 
-export const loader = async ({
-  context,
-  request,
-}: LoaderFunctionArgs) => {
-  const currentUser = (await getServerAuthSession(context, request)) as User;
+export const loader = async ({ context, request }: LoaderFunctionArgs) => {
+  const authenticator = getAuthenticator(context);
+  const currentUser = await authenticator.isAuthenticated(request);
+  if (!currentUser || !currentUser.id) return redirect("/login");
 
   const db = getDBClient(context.cloudflare.env.DB);
-  return json(
-    await getNotifications(db, context, currentUser.id)
-  );
+  return json(await getNotifications(db, context, currentUser.id));
 };
 
 export default function NotificationsPage() {

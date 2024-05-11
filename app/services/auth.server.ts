@@ -36,6 +36,7 @@ export function getAuthenticator(context: AppLoadContext) {
         callbackURL: `${context.cloudflare.env.GOOGLE_CALLBACK_BASE_URL}/auth/google/callback`,
       },
       async ({ accessToken, refreshToken, extraParams, profile }) => {
+        console.log("profile:", profile);
         const db = getDBClient(context.cloudflare.env.DB);
         const exitsUser = await db
           .select()

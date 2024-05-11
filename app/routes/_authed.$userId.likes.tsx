@@ -1,12 +1,16 @@
 import { PostCard } from "@/components/card";
-import { getServerAuthSession } from "@/features/auth";
 import { getLikePosts } from "@/features/drizzle/get/like";
 import { SerializedLikedPost } from "@/features/serializers/like";
 import { Button } from "@/features/ui/button";
 import { Icon } from "@/features/ui/icon";
 import { getDBClient } from "@/lib/client.server";
-import { User } from "@/services/auth.server";
-import { LoaderFunctionArgs, SerializeFrom, json } from "@remix-run/cloudflare";
+import { getAuthenticator } from "@/services/auth.server";
+import {
+  LoaderFunctionArgs,
+  SerializeFrom,
+  json,
+  redirect,
+} from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
 
 export const loader = async ({
@@ -16,7 +20,9 @@ export const loader = async ({
 }: LoaderFunctionArgs) => {
   if (!params.userId) throw new Response("userId is required", { status: 400 });
 
-  const currentUser = (await getServerAuthSession(context, request)) as User;
+  const authenticator = getAuthenticator(context);
+  const currentUser = await authenticator.isAuthenticated(request);
+  if (!currentUser || !currentUser.id) return redirect("/login");
 
   const db = getDBClient(context.cloudflare.env.DB);
   return json(

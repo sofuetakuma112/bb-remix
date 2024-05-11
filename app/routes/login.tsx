@@ -39,9 +39,7 @@ export default function LoginPage() {
         BeauBelleへようこそ
       </h2>
       <div className="flex flex-1 flex-col items-center pt-32">
-        <SignInWithGoogle
-          className="bg-white text-black border border-black"
-        />
+        <SignInWithGoogle className="bg-white text-black border border-black" />
       </div>
     </div>
   );

@@ -1,10 +1,11 @@
 import { SwipeCards } from "@/components/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/features/ui/tabs";
-import { User } from "@/services/auth.server";
+import { getAuthenticator } from "@/services/auth.server";
 import {
   ActionFunctionArgs,
   LoaderFunctionArgs,
   json,
+  redirect,
 } from "@remix-run/cloudflare";
 import { getDBClient } from "@/lib/client.server";
 import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
@@ -13,10 +14,12 @@ import {
   getRecommendedPosts,
 } from "@/features/drizzle/get/post";
 import { like } from "@/features/drizzle/mutation/like";
-import { getServerAuthSession } from "@/features/auth";
 
 export const loader = async ({ context, request }: LoaderFunctionArgs) => {
-  const currentUser = (await getServerAuthSession(context, request)) as User;
+  const authenticator = getAuthenticator(context);
+  const currentUser = await authenticator.isAuthenticated(request);
+  if (!currentUser || !currentUser.id) return redirect("/login");
+
   const userId = currentUser.id;
 
   const url = new URL(request.url);
@@ -32,7 +35,10 @@ export const loader = async ({ context, request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {
-  const currentUser = (await getServerAuthSession(context, request)) as User;
+  const authenticator = getAuthenticator(context);
+  const currentUser = await authenticator.isAuthenticated(request);
+  if (!currentUser || !currentUser.id) return redirect("/login");
+
   const userId = currentUser.id;
 
   const formData = await request.formData();

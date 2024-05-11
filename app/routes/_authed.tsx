@@ -1,18 +1,19 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { Header } from "@/components/header";
-import { LoaderFunctionArgs, json } from "@remix-run/cloudflare";
-import { getServerAuthSession } from "@/features/auth";
-import { User } from "@/services/auth.server";
+import { LoaderFunctionArgs, json, redirect } from "@remix-run/cloudflare";
+import { getAuthenticator } from "@/services/auth.server";
 import { getDBClient } from "@/lib/client.server";
 import { getCurerntUser } from "@/features/drizzle/get/user";
 
 export const loader = async ({ context, request }: LoaderFunctionArgs) => {
-  const user = (await getServerAuthSession(context, request)) as User;
+  const authenticator = getAuthenticator(context);
+  const currentUser = await authenticator.isAuthenticated(request);
+  if (!currentUser || !currentUser.id) return redirect("/login");
 
   const db = getDBClient(context.cloudflare.env.DB);
 
-  const currentUser = await getCurerntUser(db, context, user.id);
-  return json(currentUser);
+  const fetchedCurrentUser = await getCurerntUser(db, context, currentUser.id);
+  return json(fetchedCurrentUser);
 };
 
 export default function App() {
