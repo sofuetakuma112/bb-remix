@@ -1,13 +1,13 @@
 import {
-    followsTable,
-    likesTable,
-    notificationsTable,
-    postsTable,
-    usersTable,
-  } from "@/db/schema";
-  import { getImageUrlFromS3 } from "@/features/r2";
-  import { AppLoadContext } from "@remix-run/cloudflare";
-  import { InferSelectModel } from "drizzle-orm";
+  followsTable,
+  likesTable,
+  notificationsTable,
+  postsTable,
+  usersTable,
+} from "@/db/schema";
+import { getImageUrlFromS3 } from "@/features/r2";
+import { AppLoadContext } from "@remix-run/cloudflare";
+import { InferSelectModel } from "drizzle-orm";
 
 export async function serializeUser(
   context: AppLoadContext,
@@ -50,3 +50,18 @@ export async function serializeUser(
     createdAt: user.createdAt,
   };
 }
+
+export async function serializeCurrentUser(
+  context: AppLoadContext,
+  currentUser: InferSelectModel<typeof usersTable>
+) {
+  const imageUrl = await getImageUrlFromS3(context, currentUser.imageS3Key);
+
+  return {
+    id: currentUser.id,
+    name: currentUser.name,
+    imageUrl: imageUrl || currentUser.icon,
+  };
+}
+
+export type SerializedCurrentUser = Awaited<ReturnType<typeof serializeCurrentUser>>;

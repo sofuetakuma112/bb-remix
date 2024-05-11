@@ -3,14 +3,20 @@ import { Header } from "@/components/header";
 import { LoaderFunctionArgs, json } from "@remix-run/cloudflare";
 import { getServerAuthSession } from "@/features/auth";
 import { User } from "@/services/auth.server";
+import { getDBClient } from "@/lib/client.server";
+import { getCurerntUser } from "@/features/drizzle/get/user";
 
 export const loader = async ({ context, request }: LoaderFunctionArgs) => {
-  const currentUser = (await getServerAuthSession(context, request)) as User;
+  const user = (await getServerAuthSession(context, request)) as User;
+
+  const db = getDBClient(context.cloudflare.env.DB);
+
+  const currentUser = await getCurerntUser(db, context, user.id);
   return json(currentUser);
 };
 
 export default function App() {
-  const currentUser = useLoaderData<typeof loader>();
+  const { user: currentUser } = useLoaderData<typeof loader>();
 
   return (
     <div className="flex min-h-screen">

@@ -21,7 +21,8 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from "@/features/ui/menubar";
-import { User } from "@/services/auth.server";
+import { SerializedCurrentUser } from "@/features/serializers/user";
+import { SerializeFrom } from "@remix-run/cloudflare";
 
 type LogOutDialogProps = {
   children: React.ReactNode;
@@ -141,7 +142,7 @@ function UserProfile({ profileUrl, userId, userName }: UserProfileProps) {
 }
 
 type HeaderProps = {
-  user: User;
+  user: SerializeFrom<SerializedCurrentUser>;
 };
 
 export function Header({ user }: HeaderProps) {
@@ -239,7 +240,7 @@ export function Header({ user }: HeaderProps) {
       icon: (
         <>
           <LogOutDialogForPC className="bg-white-white" />
-          <UserIconMenu profileUrl={user.image ?? ""} userId={userId} />
+          <UserIconMenu profileUrl={user.imageUrl ?? ""} userId={userId} />
         </>
       ),
     },
@@ -252,7 +253,7 @@ export function Header({ user }: HeaderProps) {
         style={{ overflow: "visible" }}
       >
         <UserProfile
-          profileUrl={user.image ?? ""}
+          profileUrl={user.imageUrl ?? ""}
           userId={userId}
           userName={user.name}
         />

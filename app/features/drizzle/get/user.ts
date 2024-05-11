@@ -1,5 +1,5 @@
 import { usersTable } from "@/db/schema";
-import { serializeUser } from "@/features/serializers/user";
+import { serializeCurrentUser, serializeUser } from "@/features/serializers/user";
 import { DrizzleClient } from "@/features/types/drizzle";
 import { AppLoadContext } from "@remix-run/cloudflare";
 import { eq } from "drizzle-orm";
@@ -39,5 +39,23 @@ export async function getUser(
 
   return {
     user: await serializeUser(context, user, currentUser),
+  };
+}
+
+export async function getCurerntUser(
+  db: DrizzleClient,
+  context: AppLoadContext,
+  currentUserId: string
+) {
+  const currentUser = await db.query.usersTable.findFirst({
+    where: eq(usersTable.id, currentUserId),
+  })
+
+  if (!currentUser) {
+    throw new Response("User not found", { status: 404 });
+  }
+
+  return {
+    user: await serializeCurrentUser(context, currentUser),
   };
 }
