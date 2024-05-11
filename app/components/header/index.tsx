@@ -95,7 +95,7 @@ function UserIconMenu({ profileUrl, userId, className }: UserIconMenuProps) {
             <img
               src={profileUrl}
               alt="プロフィール画像"
-              className="object-fit size-full"
+              className="object-cover size-full"
             />
           </div>
         </MenubarTrigger>
