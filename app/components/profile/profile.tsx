@@ -23,7 +23,7 @@ function EditProfileDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       {userId === currentUserId ? (
         <DialogTrigger asChild>
-          <button onClick={() => setOpen(true)}>
+          <button onClick={() => setOpen(true)} className="size-full">
             <img
               src={profileUrl}
               alt="AI画像"
@@ -37,7 +37,6 @@ function EditProfileDialog({
 
       <DialogContent className="px-0 py-4">
         <EditProfile
-          userId={userId}
           userName={userName}
           close={() => setOpen(false)}
         />

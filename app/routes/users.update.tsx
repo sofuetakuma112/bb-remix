@@ -15,6 +15,13 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
   if (user) {
     const db = getDBClient(context.cloudflare.env.DB);
 
+    const foundUser = await db.query.usersTable.findFirst({
+      where: eq(usersTable.id, user.id),
+    });
+    if (!foundUser) {
+      return new Response("User not found", { status: 404 });
+    }
+
     const uploadHandler = unstable_createMemoryUploadHandler({
       maxPartSize: 1024 * 1024 * 10,
     });
@@ -23,20 +30,20 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
       uploadHandler
     );
 
+    const file = formData.get("file") as File;
+
+    let key
+    if (file.size !== 0) {
+      key = await uploadImageToS3(context, file, "posts");
+    }
+    
     const userName = formData.get("userName")?.toString();
     if (!userName) {
-        return new Response("userName is required", { status: 404 });
+      return new Response("userName is required", { status: 404 });
     }
 
-    const file = formData.get("file") as File;
-    const key = await uploadImageToS3(context, file, "posts");
-
-    const foundUser = await db.query.usersTable.findFirst({
-      where: eq(usersTable.id, user.id),
-    });
-
-    if (!foundUser) {
-      return new Response("User not found", { status: 404 });
+    if (userName === foundUser.name && !key) {
+      return null;
     }
 
     await db
@@ -49,3 +56,9 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
   }
   return null;
 };
+
+export function handleError(
+  error: unknown,
+) {
+  console.log(error);
+}

@@ -8,10 +8,10 @@ export default process.env.LOCAL_DB_PATH
       schema: "./app/db/schema.ts",
       driver: "better-sqlite",
       dbCredentials: {
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
         url: process.env.LOCAL_DB_PATH!,
       },
-    } satisfies Config)
+      dialect: "sqlite"
+    })
   : ({
       schema: "./app/db/schema.ts",
       out: "./migrations",
@@ -22,10 +22,5 @@ export default process.env.LOCAL_DB_PATH
       },
       verbose: true,
       strict: true,
+      dialect: "sqlite"
     } satisfies Config);
-
-// export default {
-//   schema: "./app/db/schema.ts",
-//   out: "./migrations",
-//   driver: "d1",
-// } satisfies Config;

@@ -40,17 +40,15 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col px-4 pt-4 sm:px-12 sm:pb-[100px] sm:pt-9">
-      <div className="text-left">
-        <Profile
-          profileUrl={user.imageUrl ?? ""}
-          currentUserId={currentUser.id}
-          userId={user.id}
-          userName={user.name ?? ""}
-          followerCount={user.followerCount}
-          followingCount={user.followingCount}
-          isFollowee={user.isFollowee}
-        />
-      </div>
+      <Profile
+        profileUrl={user.imageUrl ?? ""}
+        currentUserId={currentUser.id}
+        userId={user.id}
+        userName={user.name}
+        followerCount={user.followerCount}
+        followingCount={user.followingCount}
+        isFollowee={user.isFollowee}
+      />
       <Tab userId={user.id} posts={posts} superLikePosts={superLikePosts} />
       <div className="flex flex-col pt-4 sm:pb-[100px] sm:pt-9">
         <Outlet />
