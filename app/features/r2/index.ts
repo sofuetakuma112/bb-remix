@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 
 type S3ImageType = "avatars" | "posts";
 
-// // S3に画像をアップロードする
 async function uploadImageToS3(
   context: AppLoadContext,
   file: File,
