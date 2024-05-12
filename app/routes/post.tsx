@@ -2,6 +2,7 @@ import Upload from "@/components/publishPost/upload";
 import { Icon } from "@/features/ui/icon";
 import {
   ActionFunctionArgs,
+  json,
   redirect,
   unstable_createMemoryUploadHandler,
   unstable_parseMultipartFormData,
@@ -9,8 +10,11 @@ import {
 import { postsTable } from "@/db/schema";
 import { getDBClient } from "@/db/client.server";
 import { uploadImageToR2 } from "@/features/r2";
-import { useRouteError } from "@remix-run/react";
+import { useActionData } from "@remix-run/react";
 import { getServerAuthSession } from "@/features/auth";
+
+import { parseWithZod } from "@conform-to/zod";
+import { schema } from "@/features/formSchemas/post";
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {
   const db = getDBClient(context.cloudflare.env.DB);
@@ -25,6 +29,11 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
     request,
     uploadHandler
   );
+
+  const submission = parseWithZod(formData, { schema });
+  if (submission.status !== "success") {
+    return json(submission.reply());
+  }
 
   const file = formData.get("file") as File;
   const key = await uploadImageToR2(context, file, "posts");
@@ -42,9 +51,6 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
 
   await db.insert(postsTable).values({
     imageS3Key: key,
-    // base64Image: `data:image/${file.name
-    //   .split(".")
-    //   .pop()};base64,${arrayBufferToBase64(await file.arrayBuffer())}`,
     imageName,
     imageAge,
     prompt,
@@ -56,20 +62,12 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
   return redirect(`/${userId}/home`);
 };
 
-export function ErrorBoundary() {
-  const error = useRouteError();
-
-  if (error instanceof Error) {
-    return <div>{error.message}</div>;
-  }
-
-  return <div>{error?.toString()}</div>;
-}
-
 export default function FormPage() {
+  const lastResult = useActionData<typeof action>();
+
   return (
     <div className="pb-16 sm:pb-0">
-      <Upload />
+      <Upload lastResult={lastResult} />
       <Icon
         name="bee"
         className="mx-auto size-full max-h-[215px] max-w-[444px]"

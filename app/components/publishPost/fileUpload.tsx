@@ -54,7 +54,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ ...props }) => {
   };
 
   return (
-    <div className="flex w-full max-w-[500px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-blue-300">
+    <div className="flex w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-blue-300">
       <div
         className="p-4"
         onDragOver={handleDragOver}
