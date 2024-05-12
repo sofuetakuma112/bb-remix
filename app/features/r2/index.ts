@@ -1,4 +1,3 @@
-import { colors } from "@/lib/console";
 import { AppLoadContext } from "@remix-run/cloudflare";
 import { v4 as uuidv4 } from "uuid";
 
@@ -18,8 +17,6 @@ async function uploadImageToS3(
       contentType: file.type,
     },
   });
-
-  console.log(colors.red + "key:", key + colors.reset);
 
   return key;
 }
