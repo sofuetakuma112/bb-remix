@@ -9,18 +9,10 @@ import { FileUpload } from "@/components/publishPost/fileUpload";
 //   MAX_MB,
 // } from "@/features/const/validation";
 import { Button } from "@/features/ui/button";
-// import {
-//   Form,
-//   FormControl,
-//   FormField,
-//   FormItem,
-//   FormLabel,
-//   FormMessage,
-// } from "@/features/ui/form";
 import { Input } from "@/features/ui/input";
 import { Textarea } from "@/features/ui/textarea";
-import { Form } from "@remix-run/react";
-// import { FormMessage } from "@/features/ui/form";
+import { Form, useNavigation } from "@remix-run/react";
+import { Loader2 } from "lucide-react"
 
 // const isFileSupported = typeof File !== "undefined";
 // const hashTagWords = z
@@ -54,17 +46,8 @@ import { Form } from "@remix-run/react";
 // });
 
 export default function Upload() {
-  // const onSubmit = form.handleSubmit(
-  //   async (data: z.infer<typeof formSchema>) => {
-  //     const formData = new FormData();
-  //     formData.append("file", data.file as File);
-  //     formData.append("imageName", data.imageName);
-  //     formData.append("imageAge", data.imageAge);
-  //     formData.append("prompt", data.prompt);
-  //     formData.append("hashTag", data.hashtag);
-  //     // await createPost(formData, userId);
-  //   }
-  // );
+  const navigation = useNavigation();
+  const isSubmitting = navigation.formAction === "/post";
 
   return (
     <Form method="post" encType="multipart/form-data">
@@ -89,7 +72,6 @@ export default function Upload() {
             id="imageName-field"
             name="imageName"
           />
-          {/* <FormMessage /> */}
         </div>
         <div className="mt-4 w-full sm:mt-7 flex items-center flex-col">
           <label className="text-xl font-semibold" htmlFor="imageAge-field">
@@ -102,7 +84,6 @@ export default function Upload() {
             id="imageAge-field"
             name="imageAge"
           />
-          {/* <FormMessage /> */}
         </div>
         <div className="mt-4 w-full sm:mt-7 flex items-center flex-col">
           <label className="text-xl font-semibold" htmlFor="prompt-field">
@@ -113,7 +94,6 @@ export default function Upload() {
             id="prompt-field"
             name="prompt"
           />
-          {/* <FormMessage /> */}
         </div>
         <div className="mt-4 w-full sm:mt-7 flex items-center flex-col">
           <label className="text-xl font-semibold" htmlFor="hashtag-field">
@@ -126,13 +106,13 @@ export default function Upload() {
             type="text"
             variant="round"
           />
-          {/* <FormMessage /> */}
         </div>
         <Button
           type="submit"
           variant="upload"
           className="mt-5 font-semibold sm:mt-9"
         >
+          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           投稿する
         </Button>
       </div>
