@@ -16,7 +16,7 @@ import { isbot } from "isbot";
 import { renderToReadableStream } from "react-dom/server";
 
 export function handleError(
-  error: unknown,
+  error: unknown
   // { request }: LoaderFunctionArgs | ActionFunctionArgs
 ) {
   // Sentry.captureRemixServerException(error, "remix.server", request);

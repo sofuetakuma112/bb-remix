@@ -1,7 +1,8 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { redirect } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
-import { getAuthenticator } from "@/services/auth.server";
+import { getServerAuthSession } from "@/features/auth";
+import { getDBClient } from "@/lib/client.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -14,13 +15,8 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ context, request }: LoaderFunctionArgs) => {
-  const authenticator = getAuthenticator(context);
-
-  const user = await authenticator.isAuthenticated(request);
-
-  if (!user) {
-    return redirect("/login");
-  }
+  const db = getDBClient(context.cloudflare.env.DB);
+  await getServerAuthSession(db, context, request);
 
   return redirect("/home");
 };

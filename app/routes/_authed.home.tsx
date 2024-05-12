@@ -14,18 +14,16 @@ import {
   getRecommendedPosts,
 } from "@/features/drizzle/get/post";
 import { like } from "@/features/drizzle/mutation/like";
+import { getServerAuthSession } from "@/features/auth";
 
 export const loader = async ({ context, request }: LoaderFunctionArgs) => {
-  const authenticator = getAuthenticator(context);
-  const currentUser = await authenticator.isAuthenticated(request);
-  if (!currentUser || !currentUser.id) return redirect("/login");
+  const db = getDBClient(context.cloudflare.env.DB);
+  const currentUser = await getServerAuthSession(db, context, request);
 
   const userId = currentUser.id;
 
   const url = new URL(request.url);
   const type = url.searchParams.get("type") ?? "recommend";
-
-  const db = getDBClient(context.cloudflare.env.DB);
   const { post } =
     type === "recommend"
       ? await getRecommendedPosts(db, context, userId)
@@ -35,7 +33,7 @@ export const loader = async ({ context, request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {
-  const authenticator = getAuthenticator(context);
+  const { authenticator } = getAuthenticator(context);
   const currentUser = await authenticator.isAuthenticated(request);
   if (!currentUser || !currentUser.id) return redirect("/login");
 

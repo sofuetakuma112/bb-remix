@@ -4,9 +4,8 @@ import {
   createCookieSessionStorage,
 } from "@remix-run/cloudflare";
 import { GoogleStrategy } from "remix-auth-google";
-import { eq } from "drizzle-orm";
-import { usersTable } from "@/db/schema";
 import { getDBClient } from "@/lib/client.server";
+import { createUserIfNotExists } from "@/features/drizzle/auth";
 
 export type User = {
   id: string;
@@ -15,6 +14,9 @@ export type User = {
 };
 
 let _authenticatedUser: Authenticator<User> | null = null;
+let getSession: ReturnType<typeof createCookieSessionStorage>["getSession"];
+// let commitSession: ReturnType<typeof createCookieSessionStorage>["commitSession"];
+let destroySession: ReturnType<typeof createCookieSessionStorage>["destroySession"];
 
 export function getAuthenticator(context: AppLoadContext) {
   if (_authenticatedUser === null) {
@@ -28,7 +30,12 @@ export function getAuthenticator(context: AppLoadContext) {
         secure: import.meta.env.PROD, // enable this in prod only
       },
     });
+    getSession = sessionStorage.getSession;
+    // commitSession = sessionStorage.commitSession;
+    destroySession  = sessionStorage.destroySession
+
     _authenticatedUser = new Authenticator<User>(sessionStorage);
+
     const googleStrategy = new GoogleStrategy(
       {
         clientID: context.cloudflare.env.GOOGLE_CLIENT_ID,
@@ -36,34 +43,16 @@ export function getAuthenticator(context: AppLoadContext) {
         callbackURL: `${context.cloudflare.env.GOOGLE_CALLBACK_BASE_URL}/auth/google/callback`,
       },
       async ({ accessToken, refreshToken, extraParams, profile }) => {
-        console.log("profile:", profile);
         const db = getDBClient(context.cloudflare.env.DB);
-        const exitsUser = await db
-          .select()
-          .from(usersTable)
-          .where(eq(usersTable.providerId, profile.id))
-          .limit(1);
-        if (exitsUser.length === 0) {
-          const createUser = await db
-            .insert(usersTable)
-            .values({
-              provider: profile.provider,
-              providerId: profile.id,
-              name: profile.displayName,
-              icon: profile.photos[0].value,
-            })
-            .returning()
-            .get();
-          return {
-            id: createUser.id,
-            name: createUser.name,
-            image: createUser.icon ?? undefined,
-          };
-        }
-        return { id: exitsUser[0].id, name: exitsUser[0].name };
+        const currentUser = await createUserIfNotExists(db, profile);
+        return {
+          id: currentUser.id,
+          name: currentUser.name,
+          image: currentUser.icon ?? undefined,
+        };
       }
     );
     _authenticatedUser.use(googleStrategy);
   }
-  return _authenticatedUser;
+  return { authenticator: _authenticatedUser, getSession, destroySession };
 }

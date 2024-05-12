@@ -1,17 +1,15 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/cloudflare";
+import { ActionFunctionArgs } from "@remix-run/cloudflare";
 import { and, eq } from "drizzle-orm";
 import { getDBClient } from "@/lib/client.server";
 import { postsTable } from "@/db/schema";
-import { getAuthenticator } from "@/services/auth.server";
+import { getServerAuthSession } from "@/features/auth";
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {
-  const authenticator = getAuthenticator(context);
-  const currentUser = await authenticator.isAuthenticated(request);
-  if (!currentUser || !currentUser.id) return redirect("/login");
+  const db = getDBClient(context.cloudflare.env.DB);
+  const currentUser = await getServerAuthSession(db, context, request);
 
   if (currentUser) {
     const userId = currentUser.id;
-    const db = getDBClient(context.cloudflare.env.DB);
     const formData = await request.formData();
     const postId = formData.get("postId")?.toString();
     // validation

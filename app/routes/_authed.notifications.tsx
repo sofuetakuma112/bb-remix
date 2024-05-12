@@ -5,20 +5,17 @@ import {
   LoaderFunctionArgs,
   SerializeFrom,
   json,
-  redirect,
 } from "@remix-run/cloudflare";
 import { getDBClient } from "@/lib/client.server";
 import { convertToJST } from "@/lib/date";
 import { getNotifications } from "@/features/drizzle/get/notification";
 import { SerializedNotifierUser } from "@/features/serializers/notification";
-import { getAuthenticator } from "@/services/auth.server";
+import { getServerAuthSession } from "@/features/auth";
 
 export const loader = async ({ context, request }: LoaderFunctionArgs) => {
-  const authenticator = getAuthenticator(context);
-  const currentUser = await authenticator.isAuthenticated(request);
-  if (!currentUser || !currentUser.id) return redirect("/login");
-
   const db = getDBClient(context.cloudflare.env.DB);
+  const currentUser = await getServerAuthSession(db, context, request);
+
   return json(await getNotifications(db, context, currentUser.id));
 };
 

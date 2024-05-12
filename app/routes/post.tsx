@@ -6,16 +6,15 @@ import {
   unstable_createMemoryUploadHandler,
   unstable_parseMultipartFormData,
 } from "@remix-run/cloudflare";
-import { getAuthenticator } from "@/services/auth.server";
 import { postsTable } from "@/db/schema";
 import { getDBClient } from "@/lib/client.server";
 import { uploadImageToS3 } from "@/features/r2";
 import { useRouteError } from "@remix-run/react";
+import { getServerAuthSession } from "@/features/auth";
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {
-  const authenticator = getAuthenticator(context);
-  const currentUser = await authenticator.isAuthenticated(request);
-  if (!currentUser || !currentUser.id) return redirect("/login");
+  const db = getDBClient(context.cloudflare.env.DB);
+  const currentUser = await getServerAuthSession(db, context, request);
 
   const userId = currentUser.id;
 
@@ -50,7 +49,6 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
     .map((tag) => tag.trim())
     .map((hashtag) => `#${hashtag}`);
 
-  const db = getDBClient(context.cloudflare.env.DB);
   await db.insert(postsTable).values({
     imageS3Key: key,
     // base64Image: `data:image/${file.name
