@@ -1,12 +1,12 @@
 {
-  "version": "5",
+  "version": "6",
   "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1715087065411,
-      "tag": "0000_lonely_vision",
+      "version": "6",
+      "when": 1715477249670,
+      "tag": "0000_perfect_hannibal_king",
       "breakpoints": true
     }
   ]
