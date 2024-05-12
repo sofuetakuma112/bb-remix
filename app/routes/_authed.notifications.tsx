@@ -6,7 +6,7 @@ import {
   SerializeFrom,
   json,
 } from "@remix-run/cloudflare";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 import { convertToJST } from "@/lib/date";
 import { getNotifications } from "@/features/drizzle/get/notification";
 import { SerializedNotifierUser } from "@/features/serializers/notification";

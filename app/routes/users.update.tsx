@@ -3,7 +3,7 @@ import {
   unstable_createMemoryUploadHandler,
   unstable_parseMultipartFormData,
 } from "@remix-run/cloudflare";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 import { usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { uploadImageToS3 } from "@/features/r2";
@@ -35,7 +35,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
 
     let key;
     if (file.size !== 0) {
-      key = await uploadImageToS3(context, file, "posts");
+      key = await uploadImageToS3(context, file, "avatars");
     }
 
     const userName = formData.get("userName")?.toString();

@@ -13,3 +13,5 @@ wrangler.toml
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+seed/images

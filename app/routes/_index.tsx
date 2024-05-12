@@ -2,7 +2,7 @@ import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { redirect } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
 import { getServerAuthSession } from "@/features/auth";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 
 export const meta: MetaFunction = () => {
   return [

@@ -7,7 +7,7 @@ import {
   json,
   redirect,
 } from "@remix-run/cloudflare";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import {
   getFollowingPosts,

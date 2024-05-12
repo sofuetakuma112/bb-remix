@@ -15,12 +15,12 @@ export const loader: LoaderFunction = async ({ context, params }) => {
     return json({ message: "Object not found" }, { status: 404 });
   }
 
+  const blob = await object.blob();
+
   // R2オブジェクトのメタデータからheaderを生成
   const headers: HeadersInit = new Headers();
-  object.writeHttpMetadata(headers);
+  headers.set("contentType", blob.type.split("/").pop() ?? "");
   headers.set("etag", object.etag);
-
-  const blob = await object.blob()
 
   // オブジェクトを返す
   return new Response(blob, { headers });

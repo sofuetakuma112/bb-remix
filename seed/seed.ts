@@ -6,11 +6,34 @@ import {
   likesTable,
   followsTable,
   notificationsTable,
-} from "./schema";
+} from "@/db/schema";
 import { v4 as uuidv4 } from "uuid";
+import { hashTags } from "./const";
 
 interface Env {
   DB: D1Database;
+}
+
+function getRandomAge() {
+  const birthdate = faker.date.birthdate({ min: 18, max: 35, mode: "age" });
+  const today = new Date();
+  let age = today.getFullYear() - birthdate.getFullYear();
+  const monthDiff = today.getMonth() - birthdate.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthdate.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+}
+
+function getRandomElements(hashTags: string[]) {
+  const numElements = Math.floor(Math.random() * 11); // 0から10までのランダムな整数を生成
+  const shuffledArray = hashTags.slice().sort(() => 0.5 - Math.random()); // 配列をシャッフル
+  return shuffledArray.slice(0, numElements); // ランダムな数の要素を選択して返す
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
@@ -21,6 +44,12 @@ export default {
     // ctx: ExecutionContext
   ): Promise<Response> {
     const db = drizzle(env.DB);
+
+    const seedImages = await request.json();
+
+    if (!Array.isArray(seedImages)) {
+      throw Error("seedImages is invalid");
+    }
 
     // ユーザーデータの作成
     const userData: (typeof usersTable.$inferInsert)[] = [];
@@ -43,15 +72,16 @@ export default {
       .select({ id: usersTable.id })
       .from(usersTable)
       .all();
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < seedImages.length; i++) {
       const userId = faker.helpers.arrayElement(userIds).id;
       postData.push({
         prompt: faker.lorem.sentence(),
-        imageS3Key: "https://100k-faces.glitch.me/random-image",
-        imageName: faker.system.fileName(),
-        imageAge: faker.number.int({ min: 1, max: 100 }).toString(),
+        imageS3Key: `posts/${seedImages[i].split(".")[0]}`,
+        imageName: faker.person.firstName("female"),
+        imageAge: getRandomAge().toString(),
         imageBirthplace: faker.location.country(),
         analysisResult: true,
+        hashTags: getRandomElements(hashTags),
         userId,
       });
     }

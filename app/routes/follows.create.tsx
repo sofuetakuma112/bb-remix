@@ -1,5 +1,5 @@
 import { ActionFunctionArgs } from "@remix-run/cloudflare";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 import { followsTable } from "@/db/schema";
 import { getServerAuthSession } from "@/features/auth";
 

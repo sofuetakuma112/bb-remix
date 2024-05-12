@@ -4,7 +4,7 @@ import { getServerAuthSession } from "@/features/auth";
 import { getLikePosts } from "@/features/drizzle/get/like";
 import { getUserPosts } from "@/features/drizzle/get/post";
 import { getUser } from "@/features/drizzle/get/user";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 import { LoaderFunctionArgs, json } from "@remix-run/cloudflare";
 import { Outlet, useLoaderData } from "@remix-run/react";
 

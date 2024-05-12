@@ -4,7 +4,7 @@ import { getLikePosts } from "@/features/drizzle/get/like";
 import { SerializedLikedPost } from "@/features/serializers/like";
 import { Button } from "@/features/ui/button";
 import { Icon } from "@/features/ui/icon";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 import {
   LoaderFunctionArgs,
   SerializeFrom,

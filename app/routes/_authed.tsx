@@ -1,7 +1,7 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { Header } from "@/components/header";
 import { LoaderFunctionArgs, json } from "@remix-run/cloudflare";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 import { getCurerntUser } from "@/features/drizzle/get/user";
 import { getServerAuthSession } from "@/features/auth";
 

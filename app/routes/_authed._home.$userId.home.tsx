@@ -1,7 +1,7 @@
 import { Cards } from "@/components/home/cards";
 import { getServerAuthSession } from "@/features/auth";
 import { getUserPosts } from "@/features/drizzle/get/post";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 import { LoaderFunctionArgs, json } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
 

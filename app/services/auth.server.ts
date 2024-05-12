@@ -4,7 +4,7 @@ import {
   createCookieSessionStorage,
 } from "@remix-run/cloudflare";
 import { GoogleStrategy } from "remix-auth-google";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 import { createUserIfNotExists } from "@/features/drizzle/auth";
 
 export type User = {

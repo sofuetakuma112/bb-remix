@@ -1,6 +1,6 @@
 import { ActionFunctionArgs } from "@remix-run/cloudflare";
 import { and, eq } from "drizzle-orm";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 import { likesTable } from "@/db/schema";
 import { getServerAuthSession } from "@/features/auth";
 

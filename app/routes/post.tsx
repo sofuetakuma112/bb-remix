@@ -7,7 +7,7 @@ import {
   unstable_parseMultipartFormData,
 } from "@remix-run/cloudflare";
 import { postsTable } from "@/db/schema";
-import { getDBClient } from "@/lib/client.server";
+import { getDBClient } from "@/db/client.server";
 import { uploadImageToS3 } from "@/features/r2";
 import { useRouteError } from "@remix-run/react";
 import { getServerAuthSession } from "@/features/auth";
