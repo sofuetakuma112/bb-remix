@@ -177,16 +177,16 @@ function SwipeCardForPC({
             "translate-y-[-200%]": currentScrollIndex === 2,
           })}
         >
-          <div className="flex-1">
+          <div className="flex-1 w-1/2">
             <img
               src={imageUrl}
               alt="AI画像"
               className="size-full object-cover"
             />
           </div>
-          <div className="flex flex-1 items-center justify-center">
+          <div className="flex flex-1 items-center justify-center w-1/2 px-2 sm:px-4">
             <div className="my-auto">
-              <span className="pr-4 text-5xl text-white-white">{name}</span>
+              <span className="pr-4 text-5xl text-white-white break-all">{name}</span>
               <span className="text-4xl text-white-white">{age}</span>
             </div>
           </div>
