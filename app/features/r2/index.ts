@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 type S3ImageType = "avatars" | "posts";
 
-async function uploadImageToS3(
+async function uploadImageToR2(
   context: AppLoadContext,
   file: File,
   type: S3ImageType
@@ -21,7 +21,7 @@ async function uploadImageToS3(
   return key;
 }
 
-async function getImageUrlFromS3(context: AppLoadContext, key: string | null) {
+async function getImageUrlFromR2(context: AppLoadContext, key: string | null) {
   if (!key) return "";
 
   if (key.startsWith("http") || key.startsWith("https")) {
@@ -31,4 +31,4 @@ async function getImageUrlFromS3(context: AppLoadContext, key: string | null) {
   return `/images/${key}`
 }
 
-export { getImageUrlFromS3, uploadImageToS3 };
+export { getImageUrlFromR2, uploadImageToR2 };

@@ -1,6 +1,6 @@
 import { postsTable, usersTable, likesTable } from "@/db/schema";
 import { InferSelectModel } from "drizzle-orm";
-import { getImageUrlFromS3 } from "@/features/r2";
+import { getImageUrlFromR2 } from "@/features/r2";
 import { AppLoadContext } from "@remix-run/cloudflare";
 
 export async function serializePost(
@@ -10,7 +10,7 @@ export async function serializePost(
     likes: InferSelectModel<typeof likesTable>[];
   }
 ) {
-  const imageUrl = await getImageUrlFromS3(context, post.imageS3Key);
+  const imageUrl = await getImageUrlFromR2(context, post.imageS3Key);
 
   return {
     id: post.id,
@@ -33,7 +33,7 @@ export async function serializeUser(
   context: AppLoadContext,
   user: InferSelectModel<typeof usersTable>
 ) {
-  const imageUrl = await getImageUrlFromS3(context, user.imageS3Key);
+  const imageUrl = await getImageUrlFromR2(context, user.imageS3Key);
 
   return {
     id: user.id,

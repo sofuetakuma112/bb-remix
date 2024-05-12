@@ -1,5 +1,5 @@
 import { followsTable, usersTable } from "@/db/schema";
-import { getImageUrlFromS3 } from "@/features/r2";
+import { getImageUrlFromR2 } from "@/features/r2";
 import { AppLoadContext } from "@remix-run/cloudflare";
 import { InferSelectModel } from "drizzle-orm";
 
@@ -13,7 +13,7 @@ export async function serializeFollowerUser(
     followees: InferSelectModel<typeof followsTable>[];
   }
 ) {
-  const imageUrl = await getImageUrlFromS3(context, user.imageS3Key);
+  const imageUrl = await getImageUrlFromR2(context, user.imageS3Key);
   return {
     id: user.id,
     name: user.name,
@@ -39,7 +39,7 @@ export async function serializeFolloweeUser(
     }[];
   }
 ) {
-  const imageUrl = await getImageUrlFromS3(context, user.imageS3Key);
+  const imageUrl = await getImageUrlFromR2(context, user.imageS3Key);
   return {
     id: user.id,
     name: user.name,

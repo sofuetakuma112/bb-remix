@@ -6,7 +6,7 @@ import {
 import { getDBClient } from "@/db/client.server";
 import { usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { uploadImageToS3 } from "@/features/r2";
+import { uploadImageToR2 } from "@/features/r2";
 import { getServerAuthSession } from "@/features/auth";
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {
@@ -35,7 +35,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
 
     let key;
     if (file.size !== 0) {
-      key = await uploadImageToS3(context, file, "avatars");
+      key = await uploadImageToR2(context, file, "avatars");
     }
 
     const userName = formData.get("userName")?.toString();

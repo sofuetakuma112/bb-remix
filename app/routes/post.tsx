@@ -8,7 +8,7 @@ import {
 } from "@remix-run/cloudflare";
 import { postsTable } from "@/db/schema";
 import { getDBClient } from "@/db/client.server";
-import { uploadImageToS3 } from "@/features/r2";
+import { uploadImageToR2 } from "@/features/r2";
 import { useRouteError } from "@remix-run/react";
 import { getServerAuthSession } from "@/features/auth";
 
@@ -27,16 +27,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
   );
 
   const file = formData.get("file") as File;
-  const key = await uploadImageToS3(context, file, "posts");
-  //   const response = await context.cloudflare.env.R2.put(
-  //     `posts/${uuidv4()}`,
-  //     file,
-  //     {
-  //       httpMetadata: {
-  //         contentType: file.type,
-  //       },
-  //     }
-  //   );
+  const key = await uploadImageToR2(context, file, "posts");
 
   const imageName = formData.get("imageName") as string;
   const imageAge = formData.get("imageAge") as string;
