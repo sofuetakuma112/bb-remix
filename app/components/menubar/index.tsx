@@ -1,14 +1,13 @@
-import { Link } from "@remix-run/react";
-import { useLocation } from "@remix-run/react";
-import React from "react";
+import { Link, useLocation } from "@remix-run/react";
+
+type Icon = {
+  href?: string;
+  text: string;
+  icon: (props: { className?: string }) => JSX.Element;
+};
 
 type Props = {
-  icons: {
-    href?: string;
-    text: string;
-    icon: React.JSX.Element;
-    selectedIcon?: React.JSX.Element;
-  }[];
+  icons: Icon[];
 };
 
 function MobileMenubar({ icons }: Props) {
@@ -24,21 +23,29 @@ function MobileMenubar({ icons }: Props) {
 
   return (
     <div className="flex size-full sm:hidden">
-      {icons.map(({ href, icon, selectedIcon }, i) =>
+      {icons.map(({ href, icon: IconComponent }, i) =>
         href ? (
           <Link
             className="flex h-full flex-1 flex-col items-center"
             to={href}
             key={`header-link-${i}`}
           >
-            {selectedIconIndex === i && selectedIcon ? selectedIcon : icon}
+            {selectedIconIndex === i ? (
+              <IconComponent className="bg-accent" />
+            ) : (
+              <IconComponent />
+            )}
           </Link>
         ) : (
           <div
             className="flex h-full flex-1 flex-col items-center"
             key={`header-link-${i}`}
           >
-            {selectedIconIndex === i && selectedIcon ? selectedIcon : icon}
+            {selectedIconIndex === i ? (
+              <IconComponent className="bg-accent" />
+            ) : (
+              <IconComponent />
+            )}
           </div>
         )
       )}

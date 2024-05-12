@@ -152,13 +152,12 @@ export function Header({ user }: HeaderProps) {
     {
       href: "/home",
       text: "Home",
-      icon: (
-        <Button variant="smOutline" sp="menubar" className="bg-white-white">
-          <Icon name="home" className="size-6 sm:size-7" />
-        </Button>
-      ),
-      selectedIcon: (
-        <Button variant="smOutline" sp="menubar" className="bg-accent">
+      icon: ({ className }: { className?: string }) => (
+        <Button
+          variant="smOutline"
+          sp="menubar"
+          className={clsx("bg-white-white", className)}
+        >
           <Icon name="home" className="size-6 sm:size-7" />
         </Button>
       ),
@@ -166,13 +165,12 @@ export function Header({ user }: HeaderProps) {
     {
       href: `/notifications`,
       text: "通知",
-      icon: (
-        <Button variant="smOutline" sp="menubar" className="bg-white-white">
-          <Icon name="notification" className="size-6 sm:size-[28px]" />
-        </Button>
-      ),
-      selectedIcon: (
-        <Button variant="smOutline" sp="menubar" className="bg-accent">
+      icon: ({ className }: { className?: string }) => (
+        <Button
+          variant="smOutline"
+          sp="menubar"
+          className={clsx("bg-white-white", className)}
+        >
           <Icon name="notification" className="size-6 sm:size-[28px]" />
         </Button>
       ),
@@ -180,13 +178,12 @@ export function Header({ user }: HeaderProps) {
     {
       href: `/${userId}/followees`,
       text: "フォロー一覧",
-      icon: (
-        <Button variant="smOutline" sp="menubar" className="bg-white-white">
-          <Icon name="follow" className="size-7 sm:size-8" />
-        </Button>
-      ),
-      selectedIcon: (
-        <Button variant="smOutline" sp="menubar" className="bg-accent">
+      icon: ({ className }: { className?: string }) => (
+        <Button
+          variant="smOutline"
+          sp="menubar"
+          className={clsx("bg-white-white", className)}
+        >
           <Icon name="follow" className="size-7 sm:size-8" />
         </Button>
       ),
@@ -194,13 +191,12 @@ export function Header({ user }: HeaderProps) {
     {
       href: `/${userId}/followers`,
       text: "フォロワー一覧",
-      icon: (
-        <Button variant="smOutline" sp="menubar" className="bg-white-white">
-          <Icon name="follower" className="size-7 sm:size-8" />
-        </Button>
-      ),
-      selectedIcon: (
-        <Button variant="smOutline" sp="menubar" className="bg-accent">
+      icon: ({ className }: { className?: string }) => (
+        <Button
+          variant="smOutline"
+          sp="menubar"
+          className={clsx("bg-white-white", className)}
+        >
           <Icon name="follower" className="size-7 sm:size-8" />
         </Button>
       ),
@@ -208,13 +204,12 @@ export function Header({ user }: HeaderProps) {
     {
       href: `/${userId}/likes`,
       text: "いいね一覧",
-      icon: (
-        <Button variant="smOutline" sp="menubar" className="bg-white-white">
-          <Icon name="like" className="size-7 sm:size-8" />
-        </Button>
-      ),
-      selectedIcon: (
-        <Button variant="smOutline" sp="menubar" className="bg-accent">
+      icon: ({ className }: { className?: string }) => (
+        <Button
+          variant="smOutline"
+          sp="menubar"
+          className={clsx("bg-white-white", className)}
+        >
           <Icon name="like" className="size-7 sm:size-8" />
         </Button>
       ),
@@ -222,13 +217,12 @@ export function Header({ user }: HeaderProps) {
     {
       href: `/post`,
       text: "投稿",
-      icon: (
-        <Button variant="smOutline" sp="menubar" className="bg-white-white">
-          <Icon name="post" className="size-7 sm:size-8" />
-        </Button>
-      ),
-      selectedIcon: (
-        <Button variant="smOutline" sp="menubar" className="bg-accent">
+      icon: ({ className }: { className?: string }) => (
+        <Button
+          variant="smOutline"
+          sp="menubar"
+          className={clsx("bg-white-white", className)}
+        >
           <Icon name="post" className="size-7 sm:size-8" />
         </Button>
       ),
@@ -237,7 +231,7 @@ export function Header({ user }: HeaderProps) {
   const buttons = [
     {
       text: "ログアウト",
-      icon: (
+      icon: () => (
         <>
           <LogOutDialogForPC className="bg-white-white" />
           <UserIconMenu profileUrl={user.imageUrl ?? ""} userId={userId} />
@@ -263,8 +257,12 @@ export function Header({ user }: HeaderProps) {
               {
                 href,
                 text,
-                icon,
-              }: { href?: string; text: string; icon: React.ReactNode },
+                icon: IconComponent,
+              }: {
+                href?: string;
+                text: string;
+                icon: (props: { className?: string }) => JSX.Element;
+              },
               i
             ) =>
               href ? (
@@ -273,7 +271,7 @@ export function Header({ user }: HeaderProps) {
                   to={href}
                   key={`header-link-${i}`}
                 >
-                  {icon}
+                  <IconComponent />
                   <p className="hidden py-1 text-sm xl:block">{text}</p>
                 </Link>
               ) : (
@@ -281,7 +279,7 @@ export function Header({ user }: HeaderProps) {
                   className="flex flex-col items-center xl:w-[100px]"
                   key={`header-button-${i}`}
                 >
-                  {icon}
+                  <IconComponent />
                   <p className="hidden py-1 text-sm xl:block">{text}</p>
                 </div>
               )
