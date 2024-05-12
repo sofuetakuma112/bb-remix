@@ -5,7 +5,6 @@ import {
 } from "@/features/const/validation";
 import { z } from "zod";
 
-const isFileSupported = typeof File !== "undefined";
 const hashTagWords = z
   .string()
   .regex(
@@ -15,18 +14,16 @@ const hashTagWords = z
   .optional();
 
 export const schema = z.object({
-  file: isFileSupported
-    ? z
-        .instanceof(File, { message: "画像ファイルは必須です" })
-        .refine((file) => {
-          console.log(file);
-          return file.size <= MAX_FILE_SIZE;
-        }, `ファイルサイズが大きすぎます。${MAX_MB}MB以下のファイルを選択してください`)
-        .refine(
-          (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
-          "jpg, png, webpのいずれかの画像を選択してください"
-        )
-    : z.any().optional(),
+  file: z
+    .instanceof(File, { message: "画像ファイルは必須です" })
+    .refine((file) => {
+      console.log(file);
+      return file.size <= MAX_FILE_SIZE;
+    }, `ファイルサイズが大きすぎます。${MAX_MB}MB以下のファイルを選択してください`)
+    .refine(
+      (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
+      "jpg, png, webpのいずれかの画像を選択してください"
+    ),
   prompt: z
     .string({ required_error: "プロンプトは必須です" })
     .min(2, { message: "プロンプトは少なくとも2文字以上にしてください" }),

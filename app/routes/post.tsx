@@ -35,19 +35,22 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
     return json(submission.reply());
   }
 
-  const file = formData.get("file") as File;
-  const key = await uploadImageToR2(context, file, "posts");
+  const key = await uploadImageToR2(context, submission.value.file, "posts");
 
-  const imageName = formData.get("imageName") as string;
-  const imageAge = formData.get("imageAge") as string;
-  const prompt = formData.get("prompt") as string;
-  const hashtag = formData.get("hashtag") as string;
+  const imageName = submission.value.imageName;
+  const imageAge = submission.value.imageAge;
+  const prompt = submission.value.prompt;
+  const hashtag = submission.value.hashtag;
 
-  const trimed = hashtag.trim();
-  const hashtags = trimed.split("#").filter((tag) => tag !== "");
-  const trimmedHashtags = hashtags
-    .map((tag) => tag.trim())
-    .map((hashtag) => `#${hashtag}`);
+  const trimmedHashtags =
+    hashtag == null
+      ? undefined
+      : hashtag
+          .trim()
+          .split("#")
+          .filter((tag) => tag !== "")
+          .map((tag) => tag.trim())
+          .map((hashtag) => `#${hashtag}`);
 
   await db.insert(postsTable).values({
     imageS3Key: key,
