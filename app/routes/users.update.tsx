@@ -1,5 +1,6 @@
 import {
   ActionFunctionArgs,
+  json,
   unstable_createMemoryUploadHandler,
   unstable_parseMultipartFormData,
 } from "@remix-run/cloudflare";
@@ -8,6 +9,8 @@ import { usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { uploadImageToR2 } from "@/features/r2";
 import { getServerAuthSession } from "@/features/auth";
+import { parseWithZod } from "@conform-to/zod";
+import { schema } from "@/features/formSchemas/editProfile";
 
 export const action = async ({ context, request }: ActionFunctionArgs) => {
   const db = getDBClient(context.cloudflare.env.DB);
@@ -20,7 +23,7 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
       where: eq(usersTable.id, currentUser.id),
     });
     if (!foundUser) {
-      return new Response("User not found", { status: 404 });
+      return json({ message: "user not found" }, { status: 404 });
     }
 
     const uploadHandler = unstable_createMemoryUploadHandler({
@@ -31,20 +34,22 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
       uploadHandler
     );
 
-    const file = formData.get("file") as File;
+    const submission = parseWithZod(formData, { schema });
+    if (submission.status !== "success") {
+      return json(submission.reply());
+    }
+
+    const file = submission.value.file;
 
     let key;
-    if (file.size !== 0) {
+    if (file && file.size !== 0) {
       key = await uploadImageToR2(context, file, "avatars");
     }
 
-    const userName = formData.get("userName")?.toString();
-    if (!userName) {
-      return new Response("userName is required", { status: 404 });
-    }
+    const userName = submission.value.name;
 
     if (userName === foundUser.name && !key) {
-      return null;
+      return json({ message: "no changed" }, { status: 200 });
     }
 
     await db
@@ -55,7 +60,10 @@ export const action = async ({ context, request }: ActionFunctionArgs) => {
       })
       .where(eq(usersTable.id, currentUser.id));
   }
-  return null;
+  return json(
+    { message: "user profile successfully updated" },
+    { status: 200 }
+  );
 };
 
 export function handleError(error: unknown) {
