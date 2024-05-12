@@ -85,11 +85,11 @@ export default function HomePage() {
             </TabsTrigger>
           </TabsList>
         </div>
-        <div className="h-full max-h-[calc(100%-64px-64px)] flex-1 sm:max-h-full mx-auto">
+        <div className="h-full max-h-[calc(100%-64px-64px)] flex-1 sm:max-h-full">
           <TabsContent
             value={tabValue}
             variant="text"
-            className="h-full flex-col items-center"
+            className="h-full flex justify-center flex-1"
           >
             <SwipeCards tabValue={tabValue} post={post} />
           </TabsContent>
