@@ -114,84 +114,88 @@ export async function getFollowingPosts(
     return { post: null };
   }
 
-  // フォローしているユーザーがスーパーライクしたPostのIDの配列を取得
-  const superLikePostIds = (
-    await db.query.likesTable.findMany({
-      where: and(
-        followingUserIds.length > 0
-          ? inArray(likesTable.userId, followingUserIds)
-          : undefined,
-        eq(likesTable.likeType, "super_like")
-      ),
-      columns: { postId: true },
-      // distinctOn: likesTable.postId,
-    })
-  ).map((like) => like.postId);
+  const [superLikePostIds, myLikesPostIds] = await Promise.all([
+    // フォローしているユーザーがスーパーライクしたPostのIDの配列を取得
+    db.query.likesTable
+      .findMany({
+        where: and(
+          followingUserIds.length > 0
+            ? inArray(likesTable.userId, followingUserIds)
+            : undefined,
+          eq(likesTable.likeType, "super_like")
+        ),
+        columns: { postId: true },
+        // distinctOn: likesTable.postId,
+      })
+      .then((likes) => likes.map((like) => like.postId)),
+    // ログインユーザーがいいね/スーパーライクしたPostのIDの配列を取得
+    db.query.likesTable
+      .findMany({
+        where: eq(likesTable.userId, currentUserId),
+        columns: { postId: true },
+      })
+      .then((likes) => likes.map((like) => like.postId)),
+  ]);
   const hasSuperLikePostId = superLikePostIds.length > 0;
-
-  // ログインユーザーがいいね/スーパーライクしたPostのIDの配列を取得
-  const myLikesPostIds = (
-    await db.query.likesTable.findMany({
-      where: eq(likesTable.userId, currentUserId),
-      columns: { postId: true },
-    })
-  ).map((like) => like.postId);
   const hasMyLikesPostId = myLikesPostIds.length > 0;
 
-  // フォロー中ユーザーの投稿でかつ、自分がlike, unlike, super_likeしていない投稿
-  const followingPost = await db.query.postsTable.findFirst({
-    where: and(
-      eq(postsTable.analysisResult, true),
-      inArray(postsTable.userId, followingUserIds),
-      or(
+  const [followingPost, superLikedPost] = await Promise.all([
+    // フォロー中ユーザーの投稿でかつ、自分がlike, unlike, super_likeしていない投稿
+    db.query.postsTable.findFirst({
+      where: and(
+        eq(postsTable.analysisResult, true),
+        inArray(postsTable.userId, followingUserIds),
+        or(
+          hasSuperLikePostId
+            ? not(inArray(postsTable.id, superLikePostIds))
+            : undefined,
+          not(eq(postsTable.userId, currentUserId)),
+          hasMyLikesPostId
+            ? not(inArray(postsTable.id, myLikesPostIds))
+            : undefined
+        )
+      ),
+      orderBy: desc(postsTable.id),
+      with: {
+        user: true,
+        likes: {
+          where: eq(likesTable.likeType, "super_like"),
+          orderBy: desc(likesTable.createdAt),
+          limit: 1,
+          with: {
+            user: true,
+          },
+        },
+      },
+    }),
+    // フォロー中ユーザーがスーパーライクして、かつ自分がlike, unlike, super_likeしていない投稿
+    db.query.postsTable.findFirst({
+      where: and(
+        eq(postsTable.analysisResult, true),
         hasSuperLikePostId
-          ? not(inArray(postsTable.id, superLikePostIds))
+          ? inArray(postsTable.id, superLikePostIds)
           : undefined,
-        not(eq(postsTable.userId, currentUserId)),
-        hasMyLikesPostId
-          ? not(inArray(postsTable.id, myLikesPostIds))
-          : undefined
-      )
-    ),
-    orderBy: desc(postsTable.id),
-    with: {
-      user: true,
-      likes: {
-        where: eq(likesTable.likeType, "super_like"),
-        orderBy: desc(likesTable.createdAt),
-        limit: 1,
-        with: {
-          user: true,
+        or(
+          not(eq(postsTable.userId, currentUserId)),
+          hasMyLikesPostId
+            ? not(inArray(postsTable.id, myLikesPostIds))
+            : undefined
+        )
+      ),
+      orderBy: desc(postsTable.id),
+      with: {
+        user: true,
+        likes: {
+          where: eq(likesTable.likeType, "super_like"),
+          orderBy: desc(likesTable.createdAt),
+          limit: 1,
+          with: {
+            user: true,
+          },
         },
       },
-    },
-  });
-
-  // フォロー中ユーザーがスーパーライクして、かつ自分がlike, unlike, super_likeしていない投稿
-  const superLikedPost = await db.query.postsTable.findFirst({
-    where: and(
-      eq(postsTable.analysisResult, true),
-      hasSuperLikePostId ? inArray(postsTable.id, superLikePostIds) : undefined,
-      or(
-        not(eq(postsTable.userId, currentUserId)),
-        hasMyLikesPostId
-          ? not(inArray(postsTable.id, myLikesPostIds))
-          : undefined
-      )
-    ),
-    orderBy: desc(postsTable.id),
-    with: {
-      user: true,
-      likes: {
-        where: eq(likesTable.likeType, "super_like"),
-        orderBy: desc(likesTable.createdAt),
-        limit: 1,
-        with: {
-          user: true,
-        },
-      },
-    },
-  });
+    }),
+  ]);
 
   const posts = [followingPost, superLikedPost].flatMap((post) =>
     post == null ? [] : [post]
